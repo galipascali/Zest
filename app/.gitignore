@@ -1,1 +1,27 @@
-/build
+# Gradle
+.gradle/
+build/
+
+# Local configuration
+local.properties
+
+# IDE
+.idea/
+*.iml
+
+# Mac
+.DS_Store
+
+# Log files
+*.log
+
+# Keystore files
+*.jks
+*.keystore
+
+# Generated files
+captures/
+.externalNativeBuild/
+
+# Firebase
+google-services.json
