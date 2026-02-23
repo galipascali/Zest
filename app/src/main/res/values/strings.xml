@@ -1,5 +1,14 @@
 <resources>
-    <string name="app_name">Zest</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_name"> Zest </string>
+
+    //login fragment
+    <string name="login_header">Welcome Back</string>
+    <string name="login_sub_header">Log in to continue to Zest</string>
+    <string name="email_or_username">Email or Username</string>
+    <string name="email_or_username_placeholder">enter your email</string>
+    <string name="password">Password</string>
+    <string name="password_placeholder">enter your password</string>
+    <string name="log_in_button">Log In</string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <string name="sign_up_button">Sign up</string>
 </resources>
