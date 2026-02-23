@@ -90,10 +90,10 @@
         app:layout_constraintHorizontal_bias="0.5"
         android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:paddingTop="32dp">
+        android:paddingTop="30dp">
 
         <TextView
-            android:text="Welcome Back"
+            android:text="@string/login_header"
             android:textAlignment="center"
             android:textSize="38sp"
             android:textStyle="bold"
@@ -104,22 +104,23 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Log in to continue to Zest"
+            android:text="@string/login_sub_header"
             android:textAlignment="center"
             android:textSize="18sp"
-            android:layout_marginVertical="10dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="5dp"
             />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginVertical="10dp">
+            android:layout_marginVertical="15dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Email or Username"
+                android:text="@string/email_or_username"
                 android:textStyle="bold"
                 android:textSize="15sp"
                 android:textColor="@color/black" />
@@ -134,7 +135,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="enter your email">
+                    android:hint="@string/email_or_username_placeholder">
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
@@ -145,11 +146,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginVertical="10dp">
+            android:layout_marginVertical="15dp">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Password"
+                android:text="@string/password"
                 android:textStyle="bold"
                 android:textColor="@color/black"
                 android:textSize="15sp" />
@@ -164,7 +165,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="enter your password">
+                android:hint="@string/password_placeholder">
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
@@ -175,14 +176,15 @@
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="64dp"
-            android:text="Log In"
+            android:text="@string/log_in_button"
             android:textSize="18sp"
             android:textAllCaps="false"
             android:textStyle="bold"
             android:textColor="@color/white"
             app:cornerRadius="16dp"
             android:backgroundTint="#2F5D3B"
-            android:layout_marginVertical="15dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="10dp"
             />
         <LinearLayout
             android:layout_width="match_parent"
@@ -192,14 +194,18 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Don't have an account? "/>
+                android:text="@string/don_t_have_an_account"/>
 
-            <TextView
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSignup"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sign up"
-                android:textStyle="bold"
-                android:textColor="@android:color/black" />
+                android:text="@string/sign_up_button"
+                android:gravity="top"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
