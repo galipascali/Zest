@@ -90,7 +90,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:paddingTop="32dp">
+        android:paddingTop="30dp">
 
         <TextView
             android:text="@string/login_header"
@@ -107,14 +107,15 @@
             android:text="@string/login_sub_header"
             android:textAlignment="center"
             android:textSize="18sp"
-            android:layout_marginVertical="10dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="5dp"
             />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginVertical="10dp">
+            android:layout_marginVertical="15dp">
 
             <TextView
                 android:layout_width="match_parent"
@@ -145,7 +146,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginVertical="10dp">
+            android:layout_marginVertical="15dp">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -182,7 +183,8 @@
             android:textColor="@color/white"
             app:cornerRadius="16dp"
             android:backgroundTint="#2F5D3B"
-            android:layout_marginVertical="15dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="10dp"
             />
         <LinearLayout
             android:layout_width="match_parent"
@@ -194,12 +196,16 @@
                 android:layout_height="wrap_content"
                 android:text="@string/don_t_have_an_account"/>
 
-            <TextView
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSignup"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sign_up_button"
-                android:textStyle="bold"
-                android:textColor="@android:color/black" />
+                android:gravity="top"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -28,9 +28,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             )
         }
         backArrow.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_login_to_welcome
-            )
+            findNavController().popBackStack()
         }
     }
 }
