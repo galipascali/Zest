@@ -25,7 +25,14 @@
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.zest.ui.auth.LoginFragment"
-        android:label="Login" />
+        android:label="Login" >
+        <action
+            android:id="@+id/action_login_to_welcome"
+            app:destination="@id/welcomeFragment" />
+        <action
+            android:id="@+id/action_login_to_register"
+            app:destination="@id/registerFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/feedFragment"
