@@ -3,35 +3,41 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
     app:startDestination="@id/welcomeFragment">
+
     <fragment
         android:id="@+id/welcomeFragment"
         android:name="com.example.zest.ui.auth.WelcomeFragment"
         android:label="Welcome">
-
-    <action
-        android:id="@+id/action_welcome_to_login"
-        app:destination="@id/loginFragment" />
-
-    <action
-        android:id="@+id/action_welcome_to_register"
-        app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_welcome_to_login"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_welcome_to_register"
+            app:destination="@id/registerFragment" />
     </fragment>
-
-    <fragment
-        android:id="@+id/registerFragment"
-        android:name="com.example.zest.ui.auth.RegisterFragment"
-        android:label="Register" />
 
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.zest.ui.auth.LoginFragment"
         android:label="Login" >
         <action
-            android:id="@+id/action_login_to_welcome"
-            app:destination="@id/welcomeFragment" />
-        <action
             android:id="@+id/action_login_to_register"
             app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_login_to_feed"
+            app:destination="@id/feedFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.zest.ui.auth.RegisterFragment"
+        android:label="Register" >
+        <action
+            android:id="@+id/action_register_to_login"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_register_to_feed"
+            app:destination="@id/feedFragment" />
     </fragment>
 
     <fragment
