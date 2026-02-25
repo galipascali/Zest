@@ -137,6 +137,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/email_or_username_placeholder">
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etEmail"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -155,7 +156,7 @@
                 android:textColor="@color/black"
                 android:textSize="15sp" />
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/outlinedTextField"
+                android:id="@+id/passwordTextField"
                 app:startIconDrawable="@drawable/lock"
                 app:boxCornerRadiusBottomEnd="16dp"
                 app:boxCornerRadiusBottomStart="16dp"
@@ -167,6 +168,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/password_placeholder">
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPassword"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -182,9 +184,10 @@
             android:textStyle="bold"
             android:textColor="@color/white"
             app:cornerRadius="16dp"
-            android:backgroundTint="#2F5D3B"
+            android:backgroundTint="@color/button_background_selector"
             android:layout_marginTop="30dp"
             android:layout_marginBottom="10dp"
+            android:enabled="false"
             />
         <LinearLayout
             android:layout_width="match_parent"
