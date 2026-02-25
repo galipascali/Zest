@@ -6,10 +6,13 @@ import android.text.TextWatcher
 import android.util.Log
 import android.util.Patterns
 import android.view.View
+import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.zest.R
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
@@ -25,6 +28,14 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val passwordField = view.findViewById<TextInputEditText>(R.id.etPassword)
         val emailLayout = view.findViewById<TextInputLayout>(R.id.emailTextField)
         val passwordLayout = view.findViewById<TextInputLayout>(R.id.passwordTextField)
+        val progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
+        val overlay = view.findViewById<View>(R.id.loadingOverlay)
+
+        fun showLoading(show: Boolean) {
+            progressBar.visibility = if (show) View.VISIBLE else View.GONE
+            overlay.visibility = if (show) View.VISIBLE else View.GONE
+            btnLogin.isEnabled = !show
+        }
         var emailValidated = false
         var passwordValidated = false
 
@@ -47,10 +58,31 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
 
         btnLogin.setOnClickListener {
-                //TODO: authenticate user
-                findNavController().navigate(
-                    R.id.action_login_to_feed
-                )
+            //TODO: authenticate user
+
+            showLoading(true)
+            btnLogin.isEnabled = false
+
+            // Simulating backend call
+            view.postDelayed({
+
+                showLoading(false)
+                btnLogin.isEnabled = true
+
+                val success = true // נחליף אחר כך ל־backend אמיתי
+
+                if (success) {
+                    Toast.makeText(requireContext(), "Login Success", Toast.LENGTH_SHORT).show()
+
+                    findNavController().navigate(
+                        R.id.action_login_to_feed
+                    )                } else {
+                    Toast.makeText(requireContext(), "Login Failed", Toast.LENGTH_SHORT).show()
+                }
+
+            }, 2500)
+
+
         }
 
         btnSignup.setOnClickListener {
