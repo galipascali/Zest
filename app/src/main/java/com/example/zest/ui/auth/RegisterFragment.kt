@@ -24,7 +24,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         }
         btnLogin.setOnClickListener {
             findNavController().navigate(
-                R.id.action_login_to_register
+                R.id.action_register_to_login
             )
         }
         backArrow.setOnClickListener {
