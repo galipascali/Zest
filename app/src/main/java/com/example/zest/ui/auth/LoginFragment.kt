@@ -1,25 +1,27 @@
 package com.example.zest.ui.auth
 
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.zest.R
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
+    private lateinit var auth: FirebaseAuth
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        auth = FirebaseAuth.getInstance()
 
         val btnLogin = view.findViewById<MaterialButton>(R.id.btnLogin)
         val btnSignup = view.findViewById<MaterialButton>(R.id.btnSignup)
@@ -36,6 +38,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             overlay.visibility = if (show) View.VISIBLE else View.GONE
             btnLogin.isEnabled = !show
         }
+
         var emailValidated = false
         var passwordValidated = false
 
@@ -46,7 +49,13 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
         fun TextInputEditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
             this.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
@@ -58,31 +67,29 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
 
         btnLogin.setOnClickListener {
-            //TODO: authenticate user
+            val email = emailField.text.toString()
+            val password = passwordField.text.toString()
 
             showLoading(true)
             btnLogin.isEnabled = false
 
-            // Simulating backend call
-            view.postDelayed({
-
-                showLoading(false)
+            auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                progressBar.visibility = View.GONE
                 btnLogin.isEnabled = true
 
-                val success = true // נחליף אחר כך ל־backend אמיתי
-
-                if (success) {
-                    Toast.makeText(requireContext(), "Login Success", Toast.LENGTH_SHORT).show()
-
-                    findNavController().navigate(
-                        R.id.action_login_to_feed
-                    )                } else {
-                    Toast.makeText(requireContext(), "Login Failed", Toast.LENGTH_SHORT).show()
+                if (task.isSuccessful) {
+                    val snackBar = Snackbar.make(view, "Login Success", Snackbar.LENGTH_SHORT)
+                    snackBar.setBackgroundTint(Color.GREEN)
+                    snackBar.setTextColor(Color.WHITE)
+                    snackBar.show()
+                    findNavController().navigate(R.id.action_login_to_feed)
+                } else {
+                   val snackBar = Snackbar.make(view, "Login Failed", Snackbar.LENGTH_SHORT)
+                    snackBar.setBackgroundTint(Color.RED)
+                    snackBar.setTextColor(Color.WHITE)
+                    snackBar.show()
                 }
-
-            }, 2500)
-
-
+            }
         }
 
         btnSignup.setOnClickListener {
@@ -99,7 +106,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                 emailLayout.error = "Invalid email address"
                 emailValidated = false
-            }else {
+            } else {
                 emailLayout.error = null
                 emailValidated = true
             }
