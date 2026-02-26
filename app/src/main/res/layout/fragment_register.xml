@@ -128,6 +128,7 @@
                 app:boxCornerRadiusTopStart="16dp"
                 app:startIconDrawable="@drawable/mail">
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEmail"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -150,7 +151,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/confidential_placeholder"
+                android:hint="@string/create_password_placeholder"
                 app:boxBackgroundColor="@color/white"
                 app:boxCornerRadiusBottomEnd="16dp"
                 app:boxCornerRadiusBottomStart="16dp"
@@ -158,6 +159,7 @@
                 app:boxCornerRadiusTopStart="16dp"
                 app:startIconDrawable="@drawable/lock">
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPassword"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -180,7 +182,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/confidential_placeholder"
+                android:hint="@string/confirm_password_placeholder"
                 app:boxBackgroundColor="@color/white"
                 app:boxCornerRadiusBottomEnd="16dp"
                 app:boxCornerRadiusBottomStart="16dp"
@@ -188,6 +190,7 @@
                 app:boxCornerRadiusTopStart="16dp"
                 app:startIconDrawable="@drawable/lock">
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etConfirmPassword"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -198,13 +201,15 @@
             android:layout_width="match_parent"
             android:layout_height="64dp"
             android:layout_marginTop="20dp"
-            android:backgroundTint="#2F5D3B"
+            android:backgroundTint="@color/button_background_selector"
             android:text="@string/sign_up_button"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:cornerRadius="16dp" />
+            app:cornerRadius="16dp"
+            android:enabled="false"
+            />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

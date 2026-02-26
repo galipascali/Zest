@@ -15,8 +15,9 @@
     //register fragment
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="register_fragment_header">Create Account</string>
-    <string name="register_fragment_subheader">Join the community pf cooking lovers</string>
-    <string name="confidential_placeholder">*********************</string>
+    <string name="register_fragment_subheader">Join the community of cooking lovers</string>
+    <string name="create_password_placeholder">Create a password</string>
     <string name="confirm_password">Confirm password</string>
+    <string name="confirm_password_placeholder">Confirm your password</string>
     <string name="already_have_an_account">Already have an account?</string>
 </resources>
