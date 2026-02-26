@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "850992846504",
+    "project_id": "zest-ddba7",
+    "storage_bucket": "zest-ddba7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:850992846504:android:e58eb34021f2206ff4149d",
+        "android_client_info": {
+          "package_name": "com.example.zest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBw-zQvgcqNlBVGtBlNSHVHUHWHj5aepMY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
