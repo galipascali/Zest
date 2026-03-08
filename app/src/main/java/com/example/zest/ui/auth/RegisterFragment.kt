@@ -18,6 +18,8 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 class RegisterFragment : Fragment(R.layout.fragment_register) {
 
@@ -67,18 +69,43 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             })
         }
 
-        suspend fun registerUser(): Boolean {
+        suspend fun saveUserToFirestore(userId: String, email: String): Boolean {
+            return try {
+
+                val user = hashMapOf(
+                    "uid" to userId,
+                    "email" to email,
+                    "createdAt" to System.currentTimeMillis()
+                )
+
+                FirebaseFirestore
+                    .getInstance()
+                    .collection("users")
+                    .document(userId)
+                    .set(user)
+                    .await()
+
+                true
+
+            } catch (e: Exception) {
+                false
+            }
+        }
+
+        suspend fun registerUser(): String? {
             val email = emailField.text.toString()
             val pass = passwordField.text.toString()
 
             return try {
-                val authResult =
-                    FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, pass).await()
+                val result = FirebaseAuth
+                    .getInstance()
+                    .createUserWithEmailAndPassword(email, pass)
+                    .await()
 
-                authResult.user != null
+                result.user?.uid
 
             } catch (e: Exception) {
-                false
+                null
             }
         }
 
@@ -93,31 +120,40 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         }
 
         btnSignup.setOnClickListener {
-            showLoading(true)
-            btnLogin.isEnabled = false
-
             viewLifecycleOwner.lifecycleScope.launch {
-
                 showLoading(true)
                 btnSignup.isEnabled = false
 
-                val success = registerUser()
+                val uid = registerUser()
 
-                showLoading(false)
-                btnSignup.isEnabled = true
+                if (uid != null) {
+                    val email = emailField.text.toString()
+                    val saved = saveUserToFirestore(uid, email)
 
-                if (success) {
-                    val snackBar = Snackbar.make(view, "Register Success", Snackbar.LENGTH_SHORT)
-                    snackBar.setBackgroundTint(Color.GREEN)
-                    snackBar.setTextColor(Color.WHITE)
-                    snackBar.show()
+                    showLoading(false)
+                    btnSignup.isEnabled = true
 
-                    findNavController().navigate(
-                        R.id.action_register_to_feed
-                    )
+                    if (saved) {
+                        val snackBar = Snackbar.make(view, "Registration Success", Snackbar.LENGTH_SHORT)
+                        snackBar.setBackgroundTint(Color.GREEN)
+                        snackBar.setTextColor(Color.WHITE)
+                        snackBar.show()
+
+                        findNavController().navigate(
+                            R.id.action_register_to_feed
+                        )
+                    } else {
+                        val snackBar = Snackbar.make(view, "Registration failed", Snackbar.LENGTH_SHORT)
+                        snackBar.setBackgroundTint(Color.RED)
+                        snackBar.setTextColor(Color.WHITE)
+                        snackBar.show()
+                    }
                 } else {
-                    val snackBar = Snackbar.make(view, "Register Failed", Snackbar.LENGTH_SHORT)
-                    snackBar.setBackgroundTint(Color.GREEN)
+                    showLoading(false)
+                    btnSignup.isEnabled = true
+
+                    val snackBar = Snackbar.make(view, "Registration failed", Snackbar.LENGTH_SHORT)
+                    snackBar.setBackgroundTint(Color.RED)
                     snackBar.setTextColor(Color.WHITE)
                     snackBar.show()
                 }
