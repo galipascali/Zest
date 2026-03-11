@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="#FAFAF9"
+    android:background="@color/app_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -216,7 +216,7 @@
         android:id="@+id/loadingOverlay"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#80000000"
+        android:background="@color/black_transparent"
         android:visibility="gone"
         android:elevation="10dp"
         app:layout_constraintTop_toTopOf="parent"
@@ -230,7 +230,7 @@
         android:layout_height="107dp"
         android:elevation="20dp"
         android:visibility="gone"
-        app:indicatorColor="#2F5D3B"
+        app:indicatorColor="@color/app_green"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
