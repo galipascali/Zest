@@ -38,4 +38,8 @@
     <string name="item_name_placeholder">Item name</string>
     <string name="items_counter">0 items</string>
     <string name="ingredients_title">Ingredients</string>
+    <string name="empty_step_pos">1</string>
+    <string name="add_step_button">Add Step</string>
+    <string name="instruction_text_placeholder">What\'s the next instruction?</string>
+    <string name="steps_title">Preparation Steps</string>
 </resources>

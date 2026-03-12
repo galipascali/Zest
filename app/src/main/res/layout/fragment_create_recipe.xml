@@ -64,7 +64,8 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:paddingTop="30dp">
+            android:paddingTop="30dp"
+            android:layout_marginBottom="70dp">
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/photoContainer"
                 android:layout_width="match_parent"
@@ -134,7 +135,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:inputType="textCapSentences"
-                        tools:ignore="TextContrastCheck"/>
+                        tools:ignore="TextContrastCheck,VisualLintTextFieldSize"/>
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
@@ -172,7 +173,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="number"
-                            tools:ignore="TextContrastCheck" />
+                            tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
@@ -209,7 +210,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="number"
-                            tools:ignore="TextContrastCheck" />
+                            tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -246,7 +247,7 @@
                         android:dropDownVerticalOffset="8dp"
                         android:focusable="false"
                         android:inputType="none"
-                        tools:ignore="KeyboardInaccessibleWidget,SpeakableTextPresentCheck" />
+                        tools:ignore="KeyboardInaccessibleWidget,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
@@ -321,7 +322,7 @@
                             android:clickable="false"
                             android:focusable="false"
                             android:inputType="none"
-                            tools:ignore="TextContrastCheck"/>
+                            tools:ignore="TextContrastCheck,VisualLintTextFieldSize"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <Space
@@ -344,7 +345,7 @@
                             android:focusable="false"
                             android:background="@drawable/dashed_border_ingredient"
                             android:inputType="none"
-                            tools:ignore="TextContrastCheck"/>
+                            tools:ignore="TextContrastCheck,VisualLintTextFieldSize"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <ImageView
@@ -353,6 +354,7 @@
                         android:layout_gravity="center"
                         android:layout_margin="8dp"
                         android:src="@drawable/delete"
+                        android:visibility="invisible"
                         tools:ignore="ContentDescription,ImageContrastCheck" />
                 </LinearLayout>
 
@@ -380,6 +382,109 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text="@string/add_ingredient"
+                        android:textStyle="bold"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="15dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/stepsTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/steps_title"
+                        android:textColor="@color/dark_grey"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/stepsRecyclerView"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:layout_marginVertical="10dp"/>
+
+                <LinearLayout
+                    android:id="@+id/emptyStep"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginVertical="10dp">
+
+                    <TextView
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:layout_marginHorizontal="15dp"
+                        android:background="@drawable/circle_outline"
+                        android:gravity="center"
+                        android:text="@string/empty_step_pos"
+                        android:textColor="@color/light_grey"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        tools:ignore="TextContrastCheck" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:hint="@string/instruction_text_placeholder"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="20"
+                        android:textColorHint="@color/medium_grey"
+                        app:boxBackgroundColor="@color/white"
+                        app:shapeAppearanceOverlay="@style/roundedTextBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/dashed_border_ingredient"
+                            android:clickable="false"
+                            android:focusable="false"
+                            android:inputType="textCapSentences"
+                            tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_weight="1"
+                        android:visibility="invisible"
+                        android:layout_gravity="center"
+                        android:src="@drawable/delete"
+                        tools:ignore="ContentDescription" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/addStepButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/add_ingredient"
+                        tools:ignore="ContentDescription" />
+
+                    <Space
+                        android:layout_width="12dp"
+                        android:layout_height="1dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/add_step_button"
                         android:textStyle="bold"
                         android:textSize="16sp"/>
                 </LinearLayout>

@@ -11,12 +11,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.R
 import com.example.zest.model.Ingredient
+import com.example.zest.model.Step
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 
 class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
     private val ingredients = mutableListOf<Ingredient>()
-    private lateinit var recyclerAdapter: IngredientAdapter
+    private lateinit var IngredientRecyclerAdapter: IngredientAdapter
     private lateinit var ingredientsCountText: TextView
+    private val steps = mutableListOf<Step>()
+    private lateinit var stepsRecyclerAdapter: StepAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -24,10 +27,10 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
         val items = resources.getStringArray(R.array.difficulty_levels)
         val difficultyDropdown  = view.findViewById<MaterialAutoCompleteTextView>(R.id.etDifficulty)
         val difficultyAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, items)
-        val recycler = view.findViewById<RecyclerView>(R.id.ingredientsRecyclerView)
+        difficultyDropdown.setAdapter(difficultyAdapter)
+
         val ingredientsRecyclerView = view.findViewById<RecyclerView>(R.id.ingredientsRecyclerView)
         val emptyIngredient =  view.findViewById<LinearLayout>(R.id.emptyIngredient)
-        difficultyDropdown.setAdapter(difficultyAdapter)
 
         fun updateIngredientsCount() {
             val count = ingredients.size
@@ -42,15 +45,15 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
             ingredientsCountText.text = "$count items"
         }
 
-        recyclerAdapter = IngredientAdapter(ingredients) {
+        IngredientRecyclerAdapter = IngredientAdapter(ingredients) {
             updateIngredientsCount()
         }
-        recycler.layoutManager = LinearLayoutManager(requireContext())
-        recycler.adapter = recyclerAdapter
+        ingredientsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        ingredientsRecyclerView.adapter = IngredientRecyclerAdapter
 
         view.findViewById<LinearLayout>(R.id.addIngredientButton).setOnClickListener {
             ingredients.add(Ingredient())
-            recyclerAdapter.notifyItemInserted(ingredients.size - 1)
+            IngredientRecyclerAdapter.notifyItemInserted(ingredients.size - 1)
             updateIngredientsCount()
         }
 
@@ -71,13 +74,41 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
                 val from = viewHolder.adapterPosition
                 val to = target.adapterPosition
 
-                recyclerAdapter.moveItem(from, to)
+                IngredientRecyclerAdapter.moveItem(from, to)
                 return true
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
         })
 
-        touchHelper.attachToRecyclerView(recycler)
+        touchHelper.attachToRecyclerView(ingredientsRecyclerView)
+
+
+        val stepsRecyclerView = view.findViewById<RecyclerView>(R.id.stepsRecyclerView)
+        val emptyStep =  view.findViewById<LinearLayout>(R.id.emptyStep)
+
+        fun updateStepsCount() {
+            val count = steps.size
+            if (count > 0) {
+                emptyStep.visibility = View.GONE
+                stepsRecyclerView.visibility = View.VISIBLE
+            } else {
+                emptyStep.visibility = View.VISIBLE
+                stepsRecyclerView.visibility = View.GONE
+
+            }
+        }
+
+        stepsRecyclerAdapter = StepAdapter(steps) {
+            updateStepsCount()
+        }
+        stepsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        stepsRecyclerView.adapter = stepsRecyclerAdapter
+
+        view.findViewById<LinearLayout>(R.id.addStepButton).setOnClickListener {
+            steps.add(Step())
+            stepsRecyclerAdapter.notifyItemInserted(steps.size - 1)
+            updateStepsCount()
+        }
     }
 }
