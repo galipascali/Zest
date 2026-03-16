@@ -1,5 +1,6 @@
 package com.example.zest.ui.recipe
 
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.view.View
@@ -8,6 +9,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.EditText
 import android.text.TextWatcher
+import android.widget.ImageView
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,9 +22,43 @@ import com.example.zest.model.Step
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import java.io.File
 
 class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
+    private lateinit var photoUri: Uri
+    private var selectedImageUri: Uri? = null
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { setPhoto(it) }
+    }
+    private val takePhotoLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) setPhoto(photoUri)
+    }
+
+    private fun setPhoto(uri: Uri) {
+        selectedImageUri = uri
+        val imageView = view?.findViewById<ImageView>(R.id.recipePhoto) ?: return
+        val placeholder = view?.findViewById<LinearLayout>(R.id.photoPlaceholder) ?: return
+        imageView.setImageURI(uri)
+        imageView.visibility = View.VISIBLE
+        placeholder.visibility = View.GONE
+    }
+
+    private fun showImagePickerDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setItems(arrayOf("Take a photo", "Choose from gallery")) { _, which ->
+                when (which) {
+                    0 -> {
+                        val file = File(requireContext().cacheDir, "recipe_photo.jpg")
+                        photoUri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.provider", file)
+                        takePhotoLauncher.launch(photoUri)
+                    }
+                    1 -> pickImageLauncher.launch("image/*")
+                }
+            }
+            .show()
+    }
     private val ingredients = mutableListOf<Ingredient>()
     private lateinit var IngredientRecyclerAdapter: IngredientAdapter
     private lateinit var ingredientsCountText: TextView
@@ -54,6 +92,10 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        view.findViewById<MaterialCardView>(R.id.photoContainer).setOnClickListener {
+            showImagePickerDialog()
+        }
 
         val items = resources.getStringArray(R.array.difficulty_levels)
         val difficultyDropdown  = view.findViewById<MaterialAutoCompleteTextView>(R.id.etDifficulty)
