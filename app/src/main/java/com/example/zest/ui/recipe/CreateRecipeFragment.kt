@@ -1,10 +1,13 @@
 package com.example.zest.ui.recipe
 
 import android.os.Bundle
+import android.text.Editable
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.EditText
+import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.R
 import com.example.zest.model.Ingredient
 import com.example.zest.model.Step
+import com.google.android.flexbox.FlexboxLayout
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 
 class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
@@ -20,6 +26,31 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
     private lateinit var ingredientsCountText: TextView
     private val steps = mutableListOf<Step>()
     private lateinit var stepsRecyclerAdapter: StepAdapter
+
+    lateinit var tagsGroup: FlexboxLayout
+
+    private fun createTag(text: String, isChecked: Boolean = false ): Chip {
+        val chip = Chip(requireContext())
+
+        chip.text = "# $text"
+        chip.isCheckable = true
+        chip.chipStrokeWidth = 2f
+        chip.setChipStrokeColorResource(R.color.light_grey)
+        chip.setChipBackgroundColorResource(R.color.chip_background_selector)
+        chip.setTextColor(resources.getColorStateList(R.color.chip_text_selector))
+        chip.isChecked = isChecked
+
+        val params = FlexboxLayout.LayoutParams(
+            FlexboxLayout.LayoutParams.WRAP_CONTENT,
+            FlexboxLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            val margin = (10 * resources.displayMetrics.density).toInt()
+            setMargins(margin, 0, 0, 0)        }
+
+        chip.layoutParams = params
+
+        return chip
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -109,6 +140,39 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
             steps.add(Step())
             stepsRecyclerAdapter.notifyItemInserted(steps.size - 1)
             updateStepsCount()
+        }
+
+        tagsGroup = view.findViewById(R.id.tagsGroup)
+        val tags = listOf("Easy Meal", "Vegan", "Under 30m", "Breakfast")
+
+        tags.forEach {
+            tagsGroup.addView(createTag(it))
+        }
+        val tagInput = view.findViewById<EditText>(R.id.tagInput)
+
+        tagInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val text = s?.toString() ?: ""
+                val minWidth = (44 * resources.displayMetrics.density).toInt()
+                val newWidth = maxOf(minWidth, tagInput.paint.measureText(text).toInt() + (32 * resources.displayMetrics.density).toInt())
+                tagInput.layoutParams = tagInput.layoutParams.also { it.width = newWidth }
+            }
+        })
+
+        tagInput.setOnFocusChangeListener { _, hasFocus ->
+            tagInput.hint = if (!hasFocus && tagInput.text.isNullOrEmpty()) "+" else ""
+        }
+
+        tagInput.setOnEditorActionListener { _, _, _ ->
+            val text = tagInput.text.toString().trim()
+            if (text.isNotEmpty()) {
+                tagsGroup.addView(createTag(text, true), tagsGroup.childCount)
+                tagInput.text.clear()
+            }
+            true
         }
     }
 }
