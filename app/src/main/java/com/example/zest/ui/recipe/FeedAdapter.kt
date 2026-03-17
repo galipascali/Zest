@@ -5,13 +5,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.model.Recipe
 import com.example.zest.R
 
-class FeedAdapter(
-    private val recipes: List<Recipe>
-) : RecyclerView.Adapter<FeedAdapter.RecipeViewHolder>() {
+class FeedAdapter(applyFilters: List<Recipe>) :
+    ListAdapter<Recipe, FeedAdapter.RecipeViewHolder>(DIFF_CALLBACK) {
+
+    companion object {
+        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Recipe>() {
+            override fun areItemsTheSame(oldItem: Recipe, newItem: Recipe): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(oldItem: Recipe, newItem: Recipe): Boolean {
+                return oldItem == newItem
+            }
+        }
+    }
 
     class RecipeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.recipeTitle)
@@ -26,12 +39,10 @@ class FeedAdapter(
     }
 
     override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
-        val recipe = recipes[position]
+        val recipe = getItem(position)
 
         holder.title.text = recipe.title
-//   TODO: set image
-//        holder.image.setImageResource(recipe.imageUrl)
+        // TODO: load image from URL (use Glide or Coil)
+        //holder.image.setImageResource(recipe.imageUrl.)
     }
-
-    override fun getItemCount() = recipes.size
 }
