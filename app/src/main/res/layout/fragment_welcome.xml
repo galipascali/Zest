@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="#FAFAF9"
+    android:background="@color/app_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -105,7 +105,7 @@
             android:textStyle="bold"
             android:textColor="@color/white"
             app:cornerRadius="16dp"
-            android:backgroundTint="#2F5D3B"
+            android:backgroundTint="@color/app_green"
             android:layout_marginVertical="5dp"
             />
 
