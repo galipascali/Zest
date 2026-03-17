@@ -32,7 +32,7 @@ class IngredientAdapter(
         val ingredient = ingredients[position]
         val pos = holder.adapterPosition
 
-        holder.qty.setText(ingredient.quantity)
+        holder.qty.setText(ingredient.quantity.toString())
         holder.name.setText(ingredient.name)
         holder.delete.setOnClickListener {
             if (pos != RecyclerView.NO_POSITION) {
