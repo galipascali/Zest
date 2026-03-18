@@ -31,7 +31,7 @@
     <string name="time_placeholder">e.g. 30</string>
     <string name="servings_title">Servings</string>
     <string name="servings_placeholder">e.g. 4</string>
-    <string name="difficulty_title">Dificulty</string>
+    <string name="difficulty_title">Difficulty</string>
     <string name="select_difficulty_placeholder">Select difficulty</string>
     <string name="add_ingredient">Add Ingredient</string>
     <string name="qty">Qty</string>
@@ -43,4 +43,16 @@
     <string name="instruction_text_placeholder">What\'s the next instruction?</string>
     <string name="steps_title">Preparation Steps</string>
     <string name="tags_title">Tags</string>
+
+    //feed fragment
+    <string name="explore_title">Explore</string>
+    <string name="search_recipes_placeholder">Search recipes, tags…</string>
+
+    //filters fragment
+    <string name="filters_title">Filters</string>
+    <string name="making_time_title">Making Time</string>
+    <string name="reset_button">Reset</string>
+    <string name="apply_button">Apply</string>
+    <string name="created_by">Created by</string>
+    <string name="ap_tag_title">Spoonacular</string>
 </resources>

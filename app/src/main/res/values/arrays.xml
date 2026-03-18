@@ -5,4 +5,8 @@
         <item>Medium</item>
         <item>Hard</item>
     </string-array>
+    <array name="default_servings_range">
+        <item>1</item>
+        <item>10</item>
+    </array>
 </resources>
