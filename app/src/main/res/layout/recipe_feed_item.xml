@@ -28,7 +28,7 @@
             <TextView
                 android:drawableStart="@drawable/earth"
                 android:id="@+id/recipeTime"
-                android:text=" Spoonacular"
+                android:text="@string/ap_tag_title"
                 android:textColor="@android:color/white"
                 android:textSize="12sp"
                 android:paddingHorizontal="10dp"
@@ -88,7 +88,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <TextView
-                    android:text="Created by"
+                    android:text="@string/created_by"
                     android:textSize="12sp"
                     android:textColor="@color/dark_grey"
                     android:layout_width="wrap_content"

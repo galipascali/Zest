@@ -46,11 +46,13 @@
 
     //feed fragment
     <string name="explore_title">Explore</string>
-    <string name="search_recipes_placeholder">Search recipes, tags...</string>
+    <string name="search_recipes_placeholder">Search recipes, tags…</string>
 
     //filters fragment
     <string name="filters_title">Filters</string>
     <string name="making_time_title">Making Time</string>
     <string name="reset_button">Reset</string>
     <string name="apply_button">Apply</string>
+    <string name="created_by">Created by</string>
+    <string name="ap_tag_title">Spoonacular</string>
 </resources>

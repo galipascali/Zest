@@ -14,7 +14,7 @@ class IngredientAdapter(
     private val onListChanged: () -> Unit
 ) : RecyclerView.Adapter<IngredientAdapter.ViewHolder>() {
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val qty = view.findViewById<EditText>(R.id.etQty)
         val name = view.findViewById<EditText>(R.id.etName)
         val delete = view.findViewById<ImageView>(R.id.deleteIngredient)
@@ -30,11 +30,12 @@ class IngredientAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val ingredient = ingredients[position]
-        val pos = holder.adapterPosition
 
-        holder.qty.setText(ingredient.quantity.toString())
+        holder.qty.setText(ingredient.quantity)
         holder.name.setText(ingredient.name)
         holder.delete.setOnClickListener {
+            val pos = holder.adapterPosition
+
             if (pos != RecyclerView.NO_POSITION) {
                 ingredients.removeAt(pos)
                 notifyItemRemoved(pos)

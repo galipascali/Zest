@@ -24,7 +24,7 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
             id = "1", userId = "user_1",
             imageUrl = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
             title = "Avocado Toast", time = 10, servings = 2, difficulty = "Easy",
-            ingredients = listOf(Ingredient(2, "slices sourdough bread"), Ingredient(1, "ripe avocado")),
+            ingredients = listOf(Ingredient("2 slices", "sourdough bread"), Ingredient("1", "ripe avocado")),
             steps = listOf(Step(1, "Toast the sourdough slices until golden and crispy.")),
             tags = listOf("Easy Meal", "Vegan", "Breakfast", "Under 30m")
         ),
@@ -32,7 +32,7 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
             id = "2", userId = "user_1",
             imageUrl = "https://images.unsplash.com/photo-1563379926898-05f4575a45d8",
             title = "Spaghetti Carbonara", time = 25, servings = 4, difficulty = "Medium",
-            ingredients = listOf(Ingredient(400, "g spaghetti")),
+            ingredients = listOf(Ingredient("400 g", "spaghetti")),
             steps = listOf(Step(1, "Cook spaghetti in salted boiling water until al dente.")),
             tags = listOf("Dinner", "Italian", "Classic")
         ),
@@ -40,7 +40,7 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
             id = "3", userId = "user_2",
             imageUrl = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd",
             title = "Greek Salad", time = 15, servings = 3, difficulty = "Easy",
-            ingredients = listOf(Ingredient(3, "tomatoes, chopped")),
+            ingredients = listOf(Ingredient("3", "tomatoes, chopped")),
             steps = listOf(Step(1, "Chop tomatoes, cucumber and red onion into bite-sized pieces.")),
             tags = listOf("Salad", "Vegan", "Under 30m", "Healthy")
         ),
@@ -48,7 +48,7 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
             id = "4", userId = "user_2",
             imageUrl = "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38",
             title = "Margherita Pizza", time = 45, servings = 4, difficulty = "Medium",
-            ingredients = listOf(Ingredient(500, "g pizza dough")),
+            ingredients = listOf(Ingredient("500 g", "pizza dough")),
             steps = listOf(Step(1, "Preheat oven to 250°C with a pizza stone or tray inside.")),
             tags = listOf("Dinner", "Italian", "Weekend")
         )

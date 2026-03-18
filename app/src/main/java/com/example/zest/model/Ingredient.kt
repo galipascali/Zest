@@ -1,6 +1,6 @@
 package com.example.zest.model
 
 data class Ingredient(
-    var quantity: Number = 0,
+    var quantity: String = "",
     var name: String = ""
 )
