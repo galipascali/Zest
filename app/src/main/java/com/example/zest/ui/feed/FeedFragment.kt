@@ -43,10 +43,7 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
         val searchInput = view.findViewById<TextInputEditText>(R.id.searchInput)
         val filterButton = view.findViewById<ImageButton>(R.id.filterButton)
 
-        val adapter = FeedAdapter { recipe ->
-            val action = FeedFragmentDirections.actionFeedToRecipeDetail(recipe.id)
-            findNavController().navigate(action)
-        }
+        val adapter = FeedAdapter()
         recycler.layoutManager = LinearLayoutManager(requireContext())
         recycler.adapter = adapter
 
