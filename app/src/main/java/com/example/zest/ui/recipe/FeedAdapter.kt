@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.model.Recipe
 import com.example.zest.R
 
-class FeedAdapter(applyFilters: List<Recipe>) :
+class FeedAdapter :
     ListAdapter<Recipe, FeedAdapter.RecipeViewHolder>(DIFF_CALLBACK) {
 
     companion object {

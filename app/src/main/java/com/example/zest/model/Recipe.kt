@@ -1,15 +1,19 @@
 package com.example.zest.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "recipes")
 data class Recipe(
-    val id: String,
-    val userId: String,
+    @PrimaryKey val id: String = "",
+    val userId: String = "",
     val createdAt: Long = System.currentTimeMillis(),
-    val imageUrl: String,
-    val title: String,
-    val time: Number,
-    val servings: Number,
-    val difficulty: String,
-    val ingredients: List<Ingredient>,
-    val steps: List<Step>,
-    val tags: List<String>
+    val imageUrl: String = "",
+    val title: String = "",
+    val time: Int = 0,
+    val servings: Int = 0,
+    val difficulty: String = "",
+    val ingredients: List<Ingredient> = emptyList(),
+    val steps: List<Step> = emptyList(),
+    val tags: List<String> = emptyList()
 )
