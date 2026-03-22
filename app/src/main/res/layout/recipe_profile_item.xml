@@ -1,0 +1,58 @@
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginVertical="10dp"
+    android:backgroundTint="@color/app_background"
+    app:cardElevation="0dp">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardSection"
+                android:layout_width="160dp"
+                android:layout_height="215dp"
+                app:shapeAppearanceOverlay="@style/profileRecipeImage">
+                <ImageView
+                    android:id="@+id/imgRecipe"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/welcome_background"/>
+
+                <ImageButton
+                    android:id="@+id/editButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="end|top"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/circle_white"
+                    android:padding="10dp"
+                    android:scaleType="centerInside"
+                    app:srcCompat="@drawable/edit"/>
+
+                <TextView
+                    android:id="@+id/recipeTitle"
+                    android:text="Vegan Avocado Pasta"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"
+                    android:layout_margin="10dp"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|bottom"
+                    android:singleLine="false"
+                    android:ellipsize="end" />
+            </com.google.android.material.card.MaterialCardView>
+        </FrameLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
