@@ -50,20 +50,12 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.android.material:material:1.11.0")
     implementation("com.google.android.flexbox:flexbox:3.0.0")
-
-    // Room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
-
-    // ViewModel + LiveData
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.0")
-
-    // Picasso
     implementation("com.squareup.picasso:picasso:2.8")
-
-    // Gson (Room TypeConverters)
     implementation("com.google.code.gson:gson:2.10.1")
 
     testImplementation(libs.junit)
