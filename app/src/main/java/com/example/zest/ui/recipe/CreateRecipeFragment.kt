@@ -1,29 +1,41 @@
 package com.example.zest.ui.recipe
 
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.ArrayAdapter
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.EditText
-import android.text.TextWatcher
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.R
 import com.example.zest.model.Ingredient
+import com.example.zest.model.Recipe
 import com.example.zest.model.Step
+import com.example.zest.repository.RecipeRepository
 import com.google.android.flexbox.FlexboxLayout
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 import java.io.File
 
 class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
@@ -60,16 +72,28 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
             .show()
     }
     private val ingredients = mutableListOf<Ingredient>()
-    private lateinit var IngredientRecyclerAdapter: IngredientAdapter
+    private lateinit var ingredientRecyclerAdapter: IngredientAdapter
     private lateinit var ingredientsCountText: TextView
     private val steps = mutableListOf<Step>()
     private lateinit var stepsRecyclerAdapter: StepAdapter
+    private lateinit var tagsGroup: FlexboxLayout
+    private lateinit var publishButton: MaterialButton
 
-    lateinit var tagsGroup: FlexboxLayout
+    private var titleValidated = false
+    private var timeValidated = false
+    private var servingsValidated = false
+    private var difficultyValidated = false
 
-    private fun createTag(text: String, isChecked: Boolean = false ): Chip {
+    private fun isFormValid() =
+        titleValidated && timeValidated && servingsValidated && difficultyValidated &&
+                ingredients.isNotEmpty() && steps.isNotEmpty()
+
+    private fun updateButtonState() {
+        publishButton.isEnabled = isFormValid()
+    }
+
+    private fun createTag(text: String, isChecked: Boolean = false): Chip {
         val chip = Chip(requireContext())
-
         chip.text = "# $text"
         chip.isCheckable = true
         chip.chipStrokeWidth = 2f
@@ -83,27 +107,97 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
             FlexboxLayout.LayoutParams.WRAP_CONTENT
         ).apply {
             val margin = (10 * resources.displayMetrics.density).toInt()
-            setMargins(margin, 0, 0, 0)        }
-
+            setMargins(margin, 0, 0, 0)
+        }
         chip.layoutParams = params
-
         return chip
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        publishButton = view.findViewById(R.id.btnLogin)
+        val progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
+        val overlay = view.findViewById<View>(R.id.loadingOverlay)
+        val backArrow = view.findViewById<MaterialButton>(R.id.back_arrow)
+
+        fun showLoading(show: Boolean) {
+            progressBar.visibility = if (show) View.VISIBLE else View.GONE
+            overlay.visibility = if (show) View.VISIBLE else View.GONE
+            publishButton.isEnabled = !show
+        }
+
+        backArrow.setOnClickListener { findNavController().popBackStack() }
+
         view.findViewById<MaterialCardView>(R.id.photoContainer).setOnClickListener {
             showImagePickerDialog()
         }
 
         val items = resources.getStringArray(R.array.difficulty_levels)
-        val difficultyDropdown  = view.findViewById<MaterialAutoCompleteTextView>(R.id.etDifficulty)
+        val difficultyDropdown = view.findViewById<MaterialAutoCompleteTextView>(R.id.etDifficulty)
         val difficultyAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, items)
         difficultyDropdown.setAdapter(difficultyAdapter)
+        difficultyDropdown.setOnItemClickListener { _, _, _, _ ->
+            difficultyValidated = true
+            updateButtonState()
+        }
+
+        val titleLayout = view.findViewById<TextInputLayout>(R.id.titleTextField)
+        val titleField = view.findViewById<TextInputEditText>(R.id.etTitle)
+        titleField.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(text: Editable?) {
+                if (text.isNullOrBlank()) {
+                    titleLayout.error = "Title is required"
+                    titleValidated = false
+                } else {
+                    titleLayout.error = null
+                    titleValidated = true
+                }
+                updateButtonState()
+            }
+        })
+
+        val timeLayout = view.findViewById<TextInputLayout>(R.id.timeTextField)
+        val timeField = view.findViewById<TextInputEditText>(R.id.etTime)
+        timeField.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(text: Editable?) {
+                val value = text?.toString()?.toIntOrNull()
+                if (value == null || value <= 0) {
+                    timeLayout.error = "Enter a valid time"
+                    timeValidated = false
+                } else {
+                    timeLayout.error = null
+                    timeValidated = true
+                }
+                updateButtonState()
+            }
+        })
+
+        val servingsLayout = view.findViewById<TextInputLayout>(R.id.servingsTextField)
+        val servingsField = view.findViewById<TextInputEditText>(R.id.etServings)
+        servingsField.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(text: Editable?) {
+                val value = text?.toString()?.toIntOrNull()
+                if (value == null || value <= 0) {
+                    servingsLayout.error = "Enter a valid servings amount"
+                    servingsValidated = false
+                } else {
+                    servingsLayout.error = null
+                    servingsValidated = true
+                }
+                updateButtonState()
+            }
+        })
 
         val ingredientsRecyclerView = view.findViewById<RecyclerView>(R.id.ingredientsRecyclerView)
-        val emptyIngredient =  view.findViewById<LinearLayout>(R.id.emptyIngredient)
+        val emptyIngredient = view.findViewById<LinearLayout>(R.id.emptyIngredient)
+        ingredientsCountText = view.findViewById(R.id.ingredientsCount)
 
         fun updateIngredientsCount() {
             val count = ingredients.size
@@ -113,68 +207,52 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
             } else {
                 emptyIngredient.visibility = View.VISIBLE
                 ingredientsRecyclerView.visibility = View.GONE
-
             }
             ingredientsCountText.text = "$count items"
+            updateButtonState()
         }
 
-        IngredientRecyclerAdapter = IngredientAdapter(ingredients) {
-            updateIngredientsCount()
-        }
+        ingredientRecyclerAdapter = IngredientAdapter(ingredients) { updateIngredientsCount() }
         ingredientsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        ingredientsRecyclerView.adapter = IngredientRecyclerAdapter
+        ingredientsRecyclerView.adapter = ingredientRecyclerAdapter
 
         view.findViewById<LinearLayout>(R.id.addIngredientButton).setOnClickListener {
             ingredients.add(Ingredient())
-            IngredientRecyclerAdapter.notifyItemInserted(ingredients.size - 1)
+            ingredientRecyclerAdapter.notifyItemInserted(ingredients.size - 1)
             updateIngredientsCount()
         }
 
-        ingredientsCountText = view.findViewById(R.id.ingredientsCount)
-
-        val touchHelper = ItemTouchHelper(object :
-            ItemTouchHelper.SimpleCallback(
-                ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-                0
-            ) {
-
+        val ingredientTouchHelper = ItemTouchHelper(object :
+            ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0){
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
-
-                val from = viewHolder.adapterPosition
-                val to = target.adapterPosition
-
-                IngredientRecyclerAdapter.moveItem(from, to)
+                ingredientRecyclerAdapter.moveItem(viewHolder.adapterPosition, target.adapterPosition)
                 return true
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
         })
 
-        touchHelper.attachToRecyclerView(ingredientsRecyclerView)
-
+        ingredientTouchHelper.attachToRecyclerView(ingredientsRecyclerView)
 
         val stepsRecyclerView = view.findViewById<RecyclerView>(R.id.stepsRecyclerView)
-        val emptyStep =  view.findViewById<LinearLayout>(R.id.emptyStep)
+        val emptyStep = view.findViewById<LinearLayout>(R.id.emptyStep)
 
         fun updateStepsCount() {
-            val count = steps.size
-            if (count > 0) {
+            if (steps.size > 0) {
                 emptyStep.visibility = View.GONE
                 stepsRecyclerView.visibility = View.VISIBLE
             } else {
                 emptyStep.visibility = View.VISIBLE
                 stepsRecyclerView.visibility = View.GONE
-
             }
+            updateButtonState()
         }
 
-        stepsRecyclerAdapter = StepAdapter(steps) {
-            updateStepsCount()
-        }
+        stepsRecyclerAdapter = StepAdapter(steps) { updateStepsCount() }
         stepsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         stepsRecyclerView.adapter = stepsRecyclerAdapter
 
@@ -185,13 +263,11 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
         }
 
         tagsGroup = view.findViewById(R.id.tagsGroup)
-        val tags = listOf("Easy Meal", "Vegan", "Under 30m", "Breakfast")
-
-        tags.forEach {
+        listOf("Easy Meal", "Vegan", "Under 30m", "Breakfast").forEach {
             tagsGroup.addView(createTag(it))
         }
-        val tagInput = view.findViewById<EditText>(R.id.tagInput)
 
+        val tagInput = view.findViewById<EditText>(R.id.tagInput)
         tagInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -215,6 +291,56 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
                 tagInput.text.clear()
             }
             true
+        }
+
+        publishButton.setOnClickListener {
+            val title = titleField.text.toString().trim()
+            val time = timeField.text.toString().toInt()
+            val servings = servingsField.text.toString().toInt()
+            val difficulty = difficultyDropdown.text.toString()
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
+
+            val tags = mutableListOf<String>()
+            for (tagIndex in 0 until tagsGroup.childCount) {
+                val tag = tagsGroup.getChildAt(tagIndex)
+                if (tag is Chip && tag.isChecked) {
+                    tags.add(tag.text.toString().removePrefix("# "))
+                }
+            }
+
+            val repository = RecipeRepository(requireContext())
+
+            showLoading(true)
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                val recipe = Recipe(
+                    userId = userId,
+                    imageUrl = "", //TODO
+                    title = title,
+                    time = time,
+                    servings = servings,
+                    difficulty = difficulty,
+                    ingredients = ingredients.toList(),
+                    steps = steps.toList(),
+                    tags = tags
+                )
+
+                val success = repository.addRecipe(recipe)
+                showLoading(false)
+
+                if (success) {
+                    Snackbar.make(view, "Recipe published!", Snackbar.LENGTH_SHORT)
+                        .setBackgroundTint(Color.parseColor("#4CAF50"))
+                        .setTextColor(Color.WHITE)
+                        .show()
+                    findNavController().popBackStack()
+                } else {
+                    Snackbar.make(view, "Failed to publish recipe", Snackbar.LENGTH_SHORT)
+                        .setBackgroundTint(Color.RED)
+                        .setTextColor(Color.WHITE)
+                        .show()
+                }
+            }
         }
     }
 }
