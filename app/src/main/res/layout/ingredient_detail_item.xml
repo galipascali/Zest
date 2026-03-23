@@ -15,14 +15,14 @@
             android:id="@+id/ingredientNumber"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:textSize="15dp"
+            android:textSize="15sp"
             android:gravity="center"
             android:textColor="@color/white"
             android:background="@drawable/circle_green"
             android:layout_marginHorizontal="15dp"/>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:layout_weight="1">
@@ -31,7 +31,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:text="Chicken Breast"
                 android:textColor="@color/dark_grey"/>
 
             <TextView
@@ -39,7 +38,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:text="1 lb, minced or sliced thinly"
                 android:textColor="@color/medium_grey"/>
         </LinearLayout>
     </LinearLayout>
