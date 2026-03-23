@@ -46,10 +46,13 @@
         android:label="Feed" />
 
     <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.zest.ui.profile.ProfileFragment"
+        android:label="Profile"/>
+
+    <fragment
         android:id="@+id/createRecipeFragment"
         android:name="com.example.zest.ui.recipe.CreateRecipeFragment"
         android:label="create Recipe">
     </fragment>
 </navigation>
-
-

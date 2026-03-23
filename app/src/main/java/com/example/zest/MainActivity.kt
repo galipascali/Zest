@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.feedFragment,
-//                R.id.profileFragment
+                R.id.profileFragment
                     -> {
                     bottomBar.visibility = View.VISIBLE
                     addRecipeButton.visibility = View.VISIBLE
@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
 
         profileBtn.setOnClickListener {
             selectProfile()
-//            navController.navigate(R.id.profileFragment)
+            navController.navigate(R.id.profileFragment)
         }
 
         findViewById<FloatingActionButton>(R.id.addRecipeButton).setOnClickListener {
