@@ -55,4 +55,8 @@
     <string name="apply_button">Apply</string>
     <string name="created_by">Created by</string>
     <string name="ap_tag_title">Spoonacular</string>
+
+    //recipe details fragment
+    <string name="time_short_title">time</string>
+    <string name="instructions_title">instructions</string>
 </resources>

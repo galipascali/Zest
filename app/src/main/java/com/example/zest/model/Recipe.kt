@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class Recipe(
     @PrimaryKey val id: String = "",
     val userId: String = "",
+    val creatorEmail: String = "",
     val createdAt: Long = System.currentTimeMillis(),
     val imageUrl: String = "",
     val title: String = "",

@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.model.Recipe
 import com.example.zest.R
 
-class FeedAdapter :
+class FeedAdapter(private val onItemClick: (Recipe) -> Unit) :
     ListAdapter<Recipe, FeedAdapter.RecipeViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -44,5 +44,6 @@ class FeedAdapter :
         holder.title.text = recipe.title
         // TODO: load image from URL (use Glide or Coil)
         //holder.image.setImageResource(recipe.imageUrl.)
+        holder.itemView.setOnClickListener { onItemClick(recipe) }
     }
 }
