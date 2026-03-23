@@ -43,16 +43,32 @@
     <fragment
         android:id="@+id/feedFragment"
         android:name="com.example.zest.ui.feed.FeedFragment"
-        android:label="Feed" />
+        android:label="Feed">
+        <action
+            android:id="@+id/action_feed_to_recipe_detail"
+            app:destination="@id/recipeDetailFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.zest.ui.profile.ProfileFragment"
-        android:label="Profile"/>
+        android:label="Profile">
+        <action
+            android:id="@+id/action_profile_to_recipe_detail"
+            app:destination="@id/recipeDetailFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/createRecipeFragment"
         android:name="com.example.zest.ui.recipe.CreateRecipeFragment"
-        android:label="create Recipe">
+        android:label="Create Recipe" />
+
+    <fragment
+        android:id="@+id/recipeDetailFragment"
+        android:name="com.example.zest.ui.recipe.RecipeDetailFragment"
+        android:label="Recipe Detail">
+        <argument
+            android:name="recipeId"
+            app:argType="string" />
     </fragment>
 </navigation>

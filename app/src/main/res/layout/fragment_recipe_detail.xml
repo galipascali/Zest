@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/app_background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardSection"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.3"
+        app:cardElevation="25dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="false"
+        android:clipToOutline="true"
+        app:shapeAppearanceOverlay="@style/TopImageShape"
+        tools:targetApi="31">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/detailImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black_transparent" />
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/circle_white"
+            android:importantForAccessibility="no"
+            android:src="@drawable/arrow_back"
+            android:paddingStart="7dp"
+            tools:ignore="RtlSymmetry" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="bottom"
+            android:padding="30dp">
+            <TextView
+                android:id="@+id/detailTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"/>
+
+            <TextView
+                android:id="@+id/detailCreator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="20sp"
+                android:textColor="@color/white" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/cardSection"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/detailsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="110dp"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            android:layout_marginVertical="30dp"
+            android:layout_marginHorizontal="16dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:background="@drawable/outlined_circle">
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:importantForAccessibility="no"
+                    android:padding="5dp"
+                    android:src="@drawable/time"
+                    android:background="@drawable/circle_green"
+                    android:backgroundTint="@color/green_very_transparent"
+                    app:tint="@color/app_green"/>
+
+                <TextView
+                    android:id="@+id/detailsTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="@color/dark_grey"/>
+
+                <TextView
+                    android:id="@+id/detailsTimeTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/time_short_title"
+                    android:textSize="16sp"
+                    android:textColor="@color/medium_grey"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="19dp"
+                android:background="@drawable/outlined_circle">
+                <ImageView
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/difficulty"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:padding="5dp"
+                    android:background="@drawable/circle_green"
+                    android:backgroundTint="@color/green_very_transparent"
+                    app:tint="@color/app_green"/>
+
+                <TextView
+                    android:id="@+id/detailsDifficulty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="@color/dark_grey"/>
+
+                <TextView
+                    android:id="@+id/detailsDifficultyTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/difficulty_title"
+                    android:textSize="16sp"
+                    android:textColor="@color/medium_grey"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:background="@drawable/outlined_circle">
+                <ImageView
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/servings"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:padding="5dp"
+                    android:background="@drawable/circle_green"
+                    android:backgroundTint="@color/green_very_transparent"
+                    app:tint="@color/app_green"/>
+
+                <TextView
+                    android:id="@+id/detailsServings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="@color/dark_grey"/>
+
+                <TextView
+                    android:id="@+id/detailsServingsTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/servings_title"
+                    android:textSize="16sp"
+                    android:textColor="@color/medium_grey"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tabContainer"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="16dp"
+            android:background="@drawable/tab_bg"
+            android:padding="4dp">
+            <TextView
+                android:id="@+id/tabIngredients"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/ingredients_title"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="@color/tab_text_selector"
+                android:background="@drawable/tab_selector"/>
+
+            <TextView
+                android:id="@+id/tabInstructions"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/instructions_title"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="@color/tab_text_selector"
+                android:background="@drawable/tab_selector"/>
+        </LinearLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="24dp"
+            android:scrollbarSize="0dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/ingredientsRecycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/stepsRecycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
