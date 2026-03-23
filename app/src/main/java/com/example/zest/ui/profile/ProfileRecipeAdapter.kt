@@ -12,7 +12,7 @@ import com.example.zest.R
 import com.example.zest.model.Recipe
 import com.squareup.picasso.Picasso
 
-class ProfileRecipeAdapter() :
+class ProfileRecipeAdapter(private val onItemClick: (Recipe) -> Unit) :
     ListAdapter<Recipe, ProfileRecipeAdapter.ViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -42,5 +42,6 @@ class ProfileRecipeAdapter() :
             .placeholder(R.drawable.welcome_background)
             .error(R.drawable.welcome_background)
             .into(holder.img)
+        holder.itemView.setOnClickListener { onItemClick(item) }
     }
 }

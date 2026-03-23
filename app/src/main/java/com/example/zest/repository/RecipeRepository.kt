@@ -41,8 +41,8 @@ class RecipeRepository(context: Context) {
         return try {
             val docRef = firestore.collection("recipes").document()
             val recipeWithId = recipe.copy(id = docRef.id)
-            docRef.set(recipeWithId).await()
-            dao.upsert(recipeWithId)
+            docRef.set(recipeWithId)
+            try { dao.upsert(recipeWithId) } catch (_: Exception) {}
             true
         } catch (e: Exception) {
             false

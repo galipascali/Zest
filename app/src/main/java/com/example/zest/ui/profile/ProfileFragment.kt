@@ -17,7 +17,10 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         super.onViewCreated(view, savedInstanceState)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recipes)
-        val adapter = ProfileRecipeAdapter()
+        val adapter = ProfileRecipeAdapter{ recipe ->
+            val action = ProfileFragmentDirections.actionProfileToRecipeDetail(recipe.id)
+            findNavController().navigate(action)
+        }
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         recyclerView.adapter = adapter
 
