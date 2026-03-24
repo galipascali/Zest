@@ -1,12 +1,10 @@
 package com.example.zest.ui.auth
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Patterns
+import com.example.zest.utils.afterTextChanged
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.ProgressBar
@@ -52,24 +50,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                     passwordValidated
         }
 
-        fun TextInputEditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
-            this.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
-
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-                override fun afterTextChanged(editable: Editable?) {
-                    afterTextChanged.invoke(editable.toString())
-                    btnLogin.isEnabled = isFormValid()
-                }
-            })
-        }
 
         btnLogin.setOnClickListener {
             val email = emailField.text.toString()
@@ -132,6 +112,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 emailLayout.error = null
                 emailValidated = true
             }
+            btnLogin.isEnabled = isFormValid()
         }
 
         passwordField.afterTextChanged { password ->
@@ -142,6 +123,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 passwordLayout.error = null
                 passwordValidated = true
             }
+            btnLogin.isEnabled = isFormValid()
         }
     }
 }
