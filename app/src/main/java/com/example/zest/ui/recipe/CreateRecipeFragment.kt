@@ -35,6 +35,7 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -312,9 +313,16 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
 
             showLoading(true)
             viewLifecycleOwner.lifecycleScope.launch {
+                val creatorPhoto = try {
+                    com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                        .collection("users").document(userId).get()
+                        .await().getString("photoBase64") ?: ""
+                } catch (_: Exception) { "" }
+
                 val recipe = Recipe(
                     userId = userId,
                     creatorEmail = FirebaseAuth.getInstance().currentUser?.email ?: "",
+                    creatorPhoto = creatorPhoto,
                     imageUrl = "", //TODO
                     title = title,
                     time = time,
