@@ -311,10 +311,10 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
             val repository = RecipeRepository(requireContext())
 
             showLoading(true)
-
             viewLifecycleOwner.lifecycleScope.launch {
                 val recipe = Recipe(
                     userId = userId,
+                    creatorEmail = FirebaseAuth.getInstance().currentUser?.email ?: "",
                     imageUrl = "", //TODO
                     title = title,
                     time = time,
