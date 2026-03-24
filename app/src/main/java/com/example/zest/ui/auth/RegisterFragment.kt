@@ -3,9 +3,8 @@ package com.example.zest.ui.auth
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Patterns
+import com.example.zest.utils.afterTextChanged
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -57,21 +56,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             return emailValidated && passwordValidated && confirmPasswordValidated
         }
 
-        fun TextInputEditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
-            this.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence?, start: Int, count: Int, after: Int
-                ) {
-                }
-
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-                override fun afterTextChanged(editable: Editable?) {
-                    afterTextChanged.invoke(editable.toString())
-                    btnSignup.isEnabled = isFormValid()
-                }
-            })
-        }
 
         suspend fun saveUserToFirestore(userId: String, email: String): Boolean {
             return try {
@@ -182,6 +166,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 emailLayout.error = null
                 emailValidated = true
             }
+            btnSignup.isEnabled = isFormValid()
         }
 
         passwordField.afterTextChanged { password ->
@@ -192,11 +177,14 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 passwordLayout.error = null
                 passwordValidated = true
             }
-
             confirmPasswordValidate()
+            btnSignup.isEnabled = isFormValid()
         }
 
-        confirmPasswordField.afterTextChanged { _ -> confirmPasswordValidate() }
+        confirmPasswordField.afterTextChanged { _ ->
+            confirmPasswordValidate()
+            btnSignup.isEnabled = isFormValid()
+        }
 
         confirmPasswordField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE && btnSignup.isEnabled) {
