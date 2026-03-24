@@ -104,16 +104,17 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             } else false
         }
 
-               view.setOnTouchListener { v, event ->
-                    if (event.action == MotionEvent.ACTION_DOWN) {
-                      val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                      imm.hideSoftInputFromWindow(v.windowToken, 0)
-                          v.clearFocus()
-                        }
-                   false
-                }
+        view.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(v.windowToken, 0)
+                v.clearFocus()
+            }
+            v.performClick()
+            false
+        }
 
-                btnSignup.setOnClickListener {
+        btnSignup.setOnClickListener {
             findNavController().navigate(
                 R.id.action_login_to_register
             )
