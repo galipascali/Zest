@@ -1,11 +1,15 @@
 package com.example.zest.ui.recipe
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Base64
 import android.view.View
+import java.io.ByteArrayOutputStream
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageView
@@ -13,7 +17,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.FileProvider
+
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -21,6 +25,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.R
+import com.example.zest.utils.showImagePickerDialog
 import com.example.zest.model.Ingredient
 import com.example.zest.model.Recipe
 import com.example.zest.model.Step
@@ -38,6 +43,7 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.launch
 import java.io.File
+import androidx.core.graphics.scale
 
 class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
     private lateinit var photoUri: Uri
@@ -58,19 +64,20 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
         placeholder.visibility = View.GONE
     }
 
+    private fun encodeImageToBase64(uri: Uri): String {
+        val stream = requireContext().contentResolver.openInputStream(uri) ?: return ""
+        val original = BitmapFactory.decodeStream(stream)
+        stream.close()
+        val scaled = original.scale(800, 800)
+        val out = ByteArrayOutputStream()
+        scaled.compress(Bitmap.CompressFormat.JPEG, 70, out)
+        return Base64.encodeToString(out.toByteArray(), Base64.DEFAULT)
+    }
+
     private fun showImagePickerDialog() {
-        MaterialAlertDialogBuilder(requireContext())
-            .setItems(arrayOf("Take a photo", "Choose from gallery")) { _, which ->
-                when (which) {
-                    0 -> {
-                        val file = File(requireContext().cacheDir, "recipe_photo.jpg")
-                        photoUri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.provider", file)
-                        takePhotoLauncher.launch(photoUri)
-                    }
-                    1 -> pickImageLauncher.launch("image/*")
-                }
-            }
-            .show()
+        showImagePickerDialog("recipe_photo.jpg", takePhotoLauncher, pickImageLauncher) { uri ->
+            photoUri = uri
+        }
     }
     private val ingredients = mutableListOf<Ingredient>()
     private lateinit var ingredientRecyclerAdapter: IngredientAdapter
@@ -319,11 +326,13 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
                         .await().getString("photoBase64") ?: ""
                 } catch (_: Exception) { "" }
 
+                val imageBase64 = selectedImageUri?.let { encodeImageToBase64(it) } ?: ""
+
                 val recipe = Recipe(
                     userId = userId,
                     creatorEmail = FirebaseAuth.getInstance().currentUser?.email ?: "",
                     creatorPhoto = creatorPhoto,
-                    imageUrl = "", //TODO
+                    imageUrl = imageBase64,
                     title = title,
                     time = time,
                     servings = servings,
