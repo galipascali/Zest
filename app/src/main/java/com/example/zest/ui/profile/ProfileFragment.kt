@@ -25,6 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import java.io.ByteArrayOutputStream
 import java.io.File
+import androidx.core.graphics.scale
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
@@ -46,7 +47,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val stream = requireContext().contentResolver.openInputStream(uri) ?: return
         val original = BitmapFactory.decodeStream(stream)
         stream.close()
-        val scaled = Bitmap.createScaledBitmap(original, 200, 200, true)
+        val scaled = original.scale(200, 200)
         val out = ByteArrayOutputStream()
         scaled.compress(Bitmap.CompressFormat.JPEG, 70, out)
         pendingPhotoBase64 = Base64.encodeToString(out.toByteArray(), Base64.DEFAULT)

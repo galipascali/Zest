@@ -1,11 +1,14 @@
 package com.example.zest.ui.auth
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Patterns
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -15,6 +18,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
     private lateinit var auth: FirebaseAuth
@@ -90,6 +95,23 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                     snackBar.show()
                 }
             }
+        }
+
+        passwordField.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE && btnLogin.isEnabled) {
+                btnLogin.performClick()
+                true
+            } else false
+        }
+
+        view.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(v.windowToken, 0)
+                v.clearFocus()
+            }
+            v.performClick()
+            false
         }
 
         btnSignup.setOnClickListener {
