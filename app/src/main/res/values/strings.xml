@@ -59,4 +59,9 @@
     //recipe details fragment
     <string name="time_short_title">time</string>
     <string name="instructions_title">instructions</string>
+
+    //profile fragment
+    <string name="profile_title">Profile</string>
+    <string name="display_name">Display name</string>
+    <string name="bio">Bio</string>
 </resources>

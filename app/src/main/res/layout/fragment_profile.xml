@@ -8,9 +8,7 @@
         android:background="@color/app_background"
         android:orientation="vertical"
         android:paddingHorizontal="20dp"
-        android:paddingTop="20dp"
-        tools:layout_editor_absoluteX="-85dp"
-        tools:layout_editor_absoluteY="450dp">
+        android:paddingTop="20dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,7 +35,7 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:padding="5dp"
-                android:background="@drawable/circle_white"
+                android:background="@color/transparent"
                 android:importantForAccessibility="no"
                 android:src="@drawable/logout"
                 android:scaleType="centerInside" />
@@ -48,7 +46,20 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:minHeight="200dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:layout_marginVertical="20dp"
+            android:background="@drawable/outlined_circle">
+            <ImageButton
+                android:id="@+id/btnEditProfile"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@color/transparent"
+                android:scaleType="centerInside"
+                android:src="@drawable/edit"
+                android:layout_gravity="end"
+                android:importantForAccessibility="no"/>
+
             <ImageView
                 android:id="@+id/userAvatar"
                 android:layout_width="100dp"
@@ -57,6 +68,7 @@
                 android:src="@drawable/ic_launcher_foreground" />
 
             <TextView
+                android:id="@+id/email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
@@ -66,11 +78,20 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Home cook sharing my favorite recipes with you 🍳"
                 android:textColor="@color/black"
                 android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/bio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/dark_grey"
+                android:textSize="14sp"/>
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView

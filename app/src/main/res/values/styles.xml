@@ -16,6 +16,10 @@
         <item name="boxBackgroundColor">@color/white</item>
         <item name="boxStrokeWidth">1dp</item>
     </style>
+    <style name="circleImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
     <style name="profileRecipeImage">
         <item name="cornerSizeBottomLeft">24dp</item>
         <item name="cornerSizeBottomRight">24dp</item>
