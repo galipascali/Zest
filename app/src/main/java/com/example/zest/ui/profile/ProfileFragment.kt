@@ -6,9 +6,9 @@ import android.os.Bundle
 import android.util.Base64
 import android.view.View
 import android.widget.ImageButton
+import com.google.android.material.imageview.ShapeableImageView
 import android.widget.TextView
 import android.net.Uri
-import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
@@ -30,8 +30,8 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private val viewModel: ProfileViewModel by viewModels()
 
-   private var pendingPhotoBase64: String? = null
-    private var dialogAvatarView: ImageView? = null
+    private var pendingPhotoBase64: String? = null
+    private var dialogAvatarView: ShapeableImageView? = null
     private lateinit var cameraUri: Uri
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -75,7 +75,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val userAvatar = view.findViewById<ImageView>(R.id.userAvatar)
+        val userAvatar = view.findViewById<ShapeableImageView>(R.id.userAvatar)
         val usernameView = view.findViewById<TextView>(R.id.username)
         val emailView = view.findViewById<TextView>(R.id.email)
         val bioView = view.findViewById<TextView>(R.id.bio)
@@ -86,6 +86,23 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         val firestore = FirebaseFirestore.getInstance()
         val email = currentUser?.email ?: ""
+
+        emailView.text = email
+        usernameView.text = currentUser?.displayName?.ifBlank { null } ?: email.substringBefore("@")
+
+        currentUser?.uid?.let { uid ->
+            firestore.collection("users").document(uid).get()
+                .addOnSuccessListener { doc ->
+                    val bio = doc.getString("bio") ?: ""
+                    bioView.text = bio
+                    bioView.visibility = if (bio.isBlank()) View.GONE else View.VISIBLE
+
+                    val photoBase64 = doc.getString("photoBase64")
+                    if (!photoBase64.isNullOrBlank()) {
+                        decodeBase64ToBitmap(photoBase64)?.let { userAvatar.setImageBitmap(it) }
+                    }
+                }
+        }
 
         val adapter = ProfileRecipeAdapter { recipe ->
             val action = ProfileFragmentDirections.actionProfileToRecipeDetail(recipe.id)
@@ -115,7 +132,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             val dialogView = layoutInflater.inflate(R.layout.dialog_edit_profile, null)
             val nameInput = dialogView.findViewById<TextInputEditText>(R.id.etDisplayName)
             val bioInput = dialogView.findViewById<TextInputEditText>(R.id.etBio)
-            val avatarView = dialogView.findViewById<ImageView>(R.id.dialogAvatar)
+            val avatarView = dialogView.findViewById<ShapeableImageView>(R.id.dialogAvatar)
             dialogAvatarView = avatarView
 
             nameInput.setText(currentUser?.displayName ?: "")
