@@ -6,31 +6,29 @@ import android.os.Bundle
 import android.util.Base64
 import android.view.View
 import android.widget.ImageButton
-import com.google.android.material.imageview.ShapeableImageView
 import android.widget.TextView
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
+import androidx.core.graphics.scale
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.R
+import com.example.zest.model.User
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 import java.io.ByteArrayOutputStream
 import java.io.File
-import androidx.core.graphics.scale
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private val viewModel: ProfileViewModel by viewModels()
 
+    private var currentUser: User? = null
     private var pendingPhotoBase64: String? = null
     private var dialogAvatarView: ShapeableImageView? = null
     private lateinit var cameraUri: Uri
@@ -84,27 +82,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val btnLogout = view.findViewById<ImageButton>(R.id.btnLogout)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recipes)
 
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        val firestore = FirebaseFirestore.getInstance()
-        val email = currentUser?.email ?: ""
-
-        emailView.text = email
-        usernameView.text = currentUser?.displayName?.ifBlank { null } ?: email.substringBefore("@")
-
-        currentUser?.uid?.let { uid ->
-            firestore.collection("users").document(uid).get()
-                .addOnSuccessListener { doc ->
-                    val bio = doc.getString("bio") ?: ""
-                    bioView.text = bio
-                    bioView.visibility = if (bio.isBlank()) View.GONE else View.VISIBLE
-
-                    val photoBase64 = doc.getString("photoBase64")
-                    if (!photoBase64.isNullOrBlank()) {
-                        decodeBase64ToBitmap(photoBase64)?.let { userAvatar.setImageBitmap(it) }
-                    }
-                }
-        }
-
         val adapter = ProfileRecipeAdapter { recipe ->
             val action = ProfileFragmentDirections.actionProfileToRecipeDetail(recipe.id)
             findNavController().navigate(action)
@@ -112,15 +89,24 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         recyclerView.adapter = adapter
 
-        viewModel.recipes.observe(viewLifecycleOwner) { recipes ->
-            adapter.submitList(recipes)
+        viewModel.recipes.observe(viewLifecycleOwner) { adapter.submitList(it) }
+
+        viewModel.user.observe(viewLifecycleOwner) { profile ->
+            currentUser = profile
+            emailView.text = profile.email
+            usernameView.text = profile.displayName
+            bioView.text = profile.bio
+            bioView.visibility = if (profile.bio.isBlank()) View.GONE else View.VISIBLE
+            profile.photoBase64?.let { b64 ->
+                decodeBase64ToBitmap(b64)?.let { userAvatar.setImageBitmap(it) }
+            }
         }
 
         btnLogout.setOnClickListener {
             MaterialAlertDialogBuilder(requireContext())
                 .setMessage("Are you sure you want to logout?")
                 .setPositiveButton("Logout") { _, _ ->
-                    FirebaseAuth.getInstance().signOut()
+                    viewModel.signOut()
                     findNavController().navigate(R.id.action_profile_to_welcome)
                 }
                 .setNegativeButton("Cancel", null)
@@ -129,52 +115,34 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
         btnEditProfile.setOnClickListener {
             pendingPhotoBase64 = null
+            currentUser?.let { profile ->
+                val dialogView = layoutInflater.inflate(R.layout.dialog_edit_profile, null)
+                val nameInput = dialogView.findViewById<TextInputEditText>(R.id.etDisplayName)
+                val bioInput = dialogView.findViewById<TextInputEditText>(R.id.etBio)
+                val avatarView = dialogView.findViewById<ShapeableImageView>(R.id.dialogAvatar)
+                dialogAvatarView = avatarView
 
-            val dialogView = layoutInflater.inflate(R.layout.dialog_edit_profile, null)
-            val nameInput = dialogView.findViewById<TextInputEditText>(R.id.etDisplayName)
-            val bioInput = dialogView.findViewById<TextInputEditText>(R.id.etBio)
-            val avatarView = dialogView.findViewById<ShapeableImageView>(R.id.dialogAvatar)
-            dialogAvatarView = avatarView
+                nameInput.setText(profile.displayName)
+                bioInput.setText(profile.bio)
 
-            nameInput.setText(currentUser?.displayName ?: "")
-            bioInput.setText(bioView.text)
+                val currentBitmap = (userAvatar.drawable as? android.graphics.drawable.BitmapDrawable)?.bitmap
+                currentBitmap?.let { avatarView.setImageBitmap(it) }
 
-            val currentBitmap = (userAvatar.drawable as? android.graphics.drawable.BitmapDrawable)?.bitmap
-            currentBitmap?.let { avatarView.setImageBitmap(it) }
+                avatarView.setOnClickListener { showImagePickerDialog() }
 
-            avatarView.setOnClickListener { showImagePickerDialog() }
-
-            MaterialAlertDialogBuilder(requireContext())
-                .setView(dialogView)
-                .setPositiveButton("Save") { _, _ ->
-                    val newName = nameInput.text.toString().trim()
-                    val newBio = bioInput.text.toString().trim()
-
-                    if (newName.isNotEmpty()) {
-                        val request = UserProfileChangeRequest.Builder()
-                            .setDisplayName(newName).build()
-                        currentUser?.updateProfile(request)
-                        usernameView.text = newName
+                MaterialAlertDialogBuilder(requireContext())
+                    .setView(dialogView)
+                    .setPositiveButton("Save") { _, _ ->
+                        viewModel.updateProfile(
+                            name = nameInput.text.toString().trim(),
+                            bio = bioInput.text.toString().trim(),
+                            photoBase64 = pendingPhotoBase64
+                        )
+                        dialogAvatarView = null
                     }
-
-                    val updates = mutableMapOf<String, Any>("bio" to newBio)
-                    pendingPhotoBase64?.let { updates["photoBase64"] = it }
-
-                    currentUser?.uid?.let { uid ->
-                        firestore.collection("users").document(uid)
-                            .set(updates, SetOptions.merge())
-                    }
-
-                    bioView.text = newBio
-                    bioView.visibility = if (newBio.isBlank()) View.GONE else View.VISIBLE
-                    pendingPhotoBase64?.let { b64 ->
-                        decodeBase64ToBitmap(b64)?.let { userAvatar.setImageBitmap(it) }
-                    }
-
-                    dialogAvatarView = null
-                }
-                .setNegativeButton("Cancel") { _, _ -> dialogAvatarView = null }
-                .show()
+                    .setNegativeButton("Cancel") { _, _ -> dialogAvatarView = null }
+                    .show()
+            }
         }
     }
 
