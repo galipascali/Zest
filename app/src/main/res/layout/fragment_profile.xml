@@ -12,24 +12,35 @@
         tools:layout_editor_absoluteX="-85dp"
         tools:layout_editor_absoluteY="450dp">
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="24dp"
                 android:layout_marginEnd="5dp"
+                android:importantForAccessibility="no"
                 android:src="@drawable/logo" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Profile"
+                android:layout_weight="1"
+                android:text="@string/profile_title"
                 android:textColor="@color/black"
                 android:textSize="24sp"
                 android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/btnLogout"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="5dp"
+                android:background="@drawable/circle_white"
+                android:importantForAccessibility="no"
+                android:src="@drawable/logout"
+                android:scaleType="centerInside" />
         </LinearLayout>
 
         <LinearLayout
