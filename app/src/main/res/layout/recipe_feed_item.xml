@@ -17,6 +17,7 @@
                 android:id="@+id/recipeImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:importantForAccessibility="no"
                 android:scaleType="centerCrop"
                 android:src="@drawable/welcome_background"/>
 
@@ -26,9 +27,9 @@
                 android:background="@drawable/image_gradient" />
 
             <TextView
-                android:drawableStart="@drawable/earth"
-                android:id="@+id/recipeTime"
-                android:text="@string/ap_tag_title"
+                app:drawableStartCompat="@drawable/earth"
+                android:id="@+id/recipeApiTag"
+                android:text="@string/api_tag_title"
                 android:textColor="@android:color/white"
                 android:textSize="12sp"
                 android:paddingHorizontal="10dp"
@@ -39,10 +40,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
-
             <TextView
                 android:id="@+id/recipeTitle"
-                android:text="Avocado Toast w/ Poached Egg"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -57,13 +56,14 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/userAvatar"
                 android:src="@drawable/ic_launcher_foreground"
+                android:background="@drawable/avatar_circle"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:scaleType="centerCrop"
-                android:background="@drawable/avatar_circle"/>
+                app:shapeAppearance="@style/circleImage"/>
 
             <LinearLayout
                 android:layout_marginStart="10dp"
@@ -79,7 +79,6 @@
 
                 <TextView
                     android:id="@+id/creatorName"
-                    android:text="Foodiejane"
                     android:textStyle="bold"
                     android:textColor="@color/dark_grey"
                     android:layout_width="wrap_content"

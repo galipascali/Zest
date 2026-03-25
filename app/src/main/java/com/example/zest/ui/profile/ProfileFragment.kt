@@ -9,7 +9,6 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.FileProvider
 import androidx.core.graphics.scale
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -17,12 +16,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.R
+import com.example.zest.utils.showImagePickerDialog
 import com.example.zest.model.User
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
 import java.io.ByteArrayOutputStream
-import java.io.File
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
@@ -53,22 +52,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     }
 
     private fun showImagePickerDialog() {
-        MaterialAlertDialogBuilder(requireContext())
-            .setItems(arrayOf("Take a photo", "Choose from gallery")) { _, which ->
-                when (which) {
-                    0 -> {
-                        val file = File(requireContext().cacheDir, "profile_photo.jpg")
-                        cameraUri = FileProvider.getUriForFile(
-                            requireContext(),
-                            "${requireContext().packageName}.provider",
-                            file
-                        )
-                        takePhotoLauncher.launch(cameraUri)
-                    }
-                    1 -> pickImageLauncher.launch("image/*")
-                }
-            }
-            .show()
+        showImagePickerDialog("profile_photo.jpg", takePhotoLauncher, pickImageLauncher) { uri ->
+            cameraUri = uri
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
