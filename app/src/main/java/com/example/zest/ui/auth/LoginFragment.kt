@@ -16,8 +16,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
-import android.view.MotionEvent
-import android.view.inputmethod.InputMethodManager
+
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
     private lateinit var auth: FirebaseAuth
@@ -82,16 +81,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 btnLogin.performClick()
                 true
             } else false
-        }
-
-        view.setOnTouchListener { v, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(v.windowToken, 0)
-                v.clearFocus()
-            }
-            v.performClick()
-            false
         }
 
         btnSignup.setOnClickListener {
