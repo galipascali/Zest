@@ -90,7 +90,7 @@ class FilterBottomSheetFragment(
 
     private fun setupButtons() {
         binding.btnReset.setOnClickListener {
-            onApply(RecipeFilter())
+            onApply(RecipeFilter(searchText = currentFilter.searchText, category = currentFilter.category))
             dismiss()
         }
 
