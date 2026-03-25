@@ -1,14 +1,12 @@
 package com.example.zest.ui.profile
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.R
+import com.example.zest.databinding.RecipeProfileItemBinding
 import com.example.zest.model.Recipe
 import com.example.zest.utils.loadImage
 
@@ -23,22 +21,17 @@ class ProfileRecipeAdapter(
         }
     }
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val img: ImageView = view.findViewById(R.id.imgRecipe)
-        val title: TextView = view.findViewById(R.id.recipeTitle)
-        val editButton: ImageView = view.findViewById(R.id.editButton)
-    }
+    class ViewHolder(val binding: RecipeProfileItemBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.recipe_profile_item, parent, false)
-        return ViewHolder(view)
+        val binding = RecipeProfileItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        holder.title.text = item.title
-        holder.img.loadImage(item.imageUrl, R.drawable.welcome_background)
+        holder.binding.recipeTitle.text = item.title
+        holder.binding.imgRecipe.loadImage(item.imageUrl, R.drawable.welcome_background)
         holder.itemView.setOnClickListener { onItemClick(item) }
     }
 }

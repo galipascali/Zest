@@ -1,18 +1,15 @@
 package com.example.zest.ui.recipe
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.zest.model.Recipe
 import com.example.zest.R
+import com.example.zest.databinding.RecipeFeedItemBinding
+import com.example.zest.model.Recipe
 import com.example.zest.utils.loadImage
-import com.google.android.material.imageview.ShapeableImageView
 
 class FeedAdapter(
     private val onItemClick: (Recipe) -> Unit
@@ -25,30 +22,24 @@ class FeedAdapter(
         }
     }
 
-    class RecipeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val title: TextView = view.findViewById(R.id.recipeTitle)
-        val creator: TextView = view.findViewById(R.id.creatorName)
-        val image: ImageView = view.findViewById(R.id.recipeImage)
-        val avatar: ShapeableImageView = view.findViewById(R.id.userAvatar)
-        val apiTag: TextView = view.findViewById(R.id.recipeApiTag)
-    }
+    class RecipeViewHolder(val binding: RecipeFeedItemBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.recipe_feed_item, parent, false)
-        return RecipeViewHolder(view)
+        val binding = RecipeFeedItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return RecipeViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
         val recipe = getItem(position)
+        val b = holder.binding
 
-        holder.title.text = recipe.title
-        holder.creator.text = recipe.creatorEmail.substringBefore("@")
-        holder.image.loadImage(recipe.imageUrl, R.drawable.welcome_background)
-        holder.avatar.loadImage(recipe.creatorPhoto)
+        b.recipeTitle.text = recipe.title
+        b.creatorName.text = recipe.creatorEmail.substringBefore("@")
+        b.recipeImage.loadImage(recipe.imageUrl, R.drawable.welcome_background)
+        b.userAvatar.loadImage(recipe.creatorPhoto)
 
         val apiTagTitle = holder.itemView.context.getString(R.string.api_tag_title)
-        holder.apiTag.isVisible = recipe.creatorEmail.substringBefore("@") == apiTagTitle
+        b.recipeApiTag.isVisible = recipe.creatorEmail.substringBefore("@") == apiTagTitle
         holder.itemView.setOnClickListener { onItemClick(recipe) }
     }
 }
