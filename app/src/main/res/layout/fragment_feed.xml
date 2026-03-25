@@ -5,12 +5,10 @@
     android:layout_height="match_parent"
     android:background="@color/app_background">
     <LinearLayout
-        android:id="@+id/feedContent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingHorizontal="20dp"
         android:paddingTop="20dp"
-        android:visibility="invisible"
         android:layout_width="match_parent">
         <LinearLayout
             android:orientation="horizontal"
