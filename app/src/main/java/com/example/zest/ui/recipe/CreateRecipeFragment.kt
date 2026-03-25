@@ -5,13 +5,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import com.example.zest.utils.showLoading
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -20,26 +17,28 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.R
-import com.example.zest.utils.showImagePickerDialog
+import com.example.zest.databinding.FragmentCreateRecipeBinding
 import com.example.zest.model.Ingredient
 import com.example.zest.model.Recipe
 import com.example.zest.model.Step
 import com.example.zest.repository.RecipeRepository
+import com.example.zest.utils.showImagePickerDialog
+import com.example.zest.utils.showLoading
+import com.example.zest.utils.uploadImageToStorage
 import com.google.android.flexbox.FlexboxLayout
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.MaterialAutoCompleteTextView
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
-import com.example.zest.utils.uploadImageToStorage
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
-class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
+class CreateRecipeFragment : Fragment() {
+
+    private var _binding: FragmentCreateRecipeBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var photoUri: Uri
     private var selectedImageUri: Uri? = null
+
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let { setPhoto(it) }
     }
@@ -49,11 +48,9 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
 
     private fun setPhoto(uri: Uri) {
         selectedImageUri = uri
-        val imageView = view?.findViewById<ImageView>(R.id.recipePhoto) ?: return
-        val placeholder = view?.findViewById<LinearLayout>(R.id.photoPlaceholder) ?: return
-        imageView.setImageURI(uri)
-        imageView.visibility = View.VISIBLE
-        placeholder.visibility = View.GONE
+        _binding?.recipePhoto?.setImageURI(uri)
+        _binding?.recipePhoto?.visibility = View.VISIBLE
+        _binding?.photoPlaceholder?.visibility = View.GONE
     }
 
     private fun showImagePickerDialog() {
@@ -61,13 +58,11 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
             photoUri = uri
         }
     }
+
     private val ingredients = mutableListOf<Ingredient>()
     private lateinit var ingredientRecyclerAdapter: IngredientAdapter
-    private lateinit var ingredientsCountText: TextView
     private val steps = mutableListOf<Step>()
     private lateinit var stepsRecyclerAdapter: StepAdapter
-    private lateinit var tagsGroup: FlexboxLayout
-    private lateinit var publishButton: MaterialButton
 
     private var titleValidated = false
     private var timeValidated = false
@@ -79,7 +74,7 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
                 ingredients.isNotEmpty() && steps.isNotEmpty()
 
     private fun updateButtonState() {
-        publishButton.isEnabled = isFormValid()
+        _binding?.btnLogin?.isEnabled = isFormValid()
     }
 
     private fun createTag(text: String, isChecked: Boolean = false): Chip {
@@ -103,114 +98,108 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
         return chip
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentCreateRecipeBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        publishButton = view.findViewById(R.id.btnLogin)
-        val backArrow = view.findViewById<MaterialButton>(R.id.back_arrow)
-
         fun showLoading(show: Boolean) {
             this.showLoading(show)
-            publishButton.isEnabled = !show
+            binding.btnLogin.isEnabled = !show
         }
 
-        backArrow.setOnClickListener { findNavController().popBackStack() }
+        binding.backArrow.setOnClickListener { findNavController().popBackStack() }
 
-        view.findViewById<MaterialCardView>(R.id.photoContainer).setOnClickListener {
-            showImagePickerDialog()
-        }
+        binding.photoContainer.setOnClickListener { showImagePickerDialog() }
 
         val items = resources.getStringArray(R.array.difficulty_levels)
-        val difficultyDropdown = view.findViewById<MaterialAutoCompleteTextView>(R.id.etDifficulty)
         val difficultyAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, items)
-        difficultyDropdown.setAdapter(difficultyAdapter)
-        difficultyDropdown.setOnItemClickListener { _, _, _, _ ->
+        binding.etDifficulty.setAdapter(difficultyAdapter)
+        binding.etDifficulty.setOnItemClickListener { _, _, _, _ ->
             difficultyValidated = true
             updateButtonState()
         }
 
-        val titleLayout = view.findViewById<TextInputLayout>(R.id.titleTextField)
-        val titleField = view.findViewById<TextInputEditText>(R.id.etTitle)
-        titleField.addTextChangedListener(object : TextWatcher {
+        binding.etTitle.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(text: Editable?) {
                 if (text.isNullOrBlank()) {
-                    titleLayout.error = "Title is required"
+                    binding.titleTextField.error = "Title is required"
                     titleValidated = false
                 } else {
-                    titleLayout.error = null
+                    binding.titleTextField.error = null
                     titleValidated = true
                 }
                 updateButtonState()
             }
         })
 
-        val timeLayout = view.findViewById<TextInputLayout>(R.id.timeTextField)
-        val timeField = view.findViewById<TextInputEditText>(R.id.etTime)
-        timeField.addTextChangedListener(object : TextWatcher {
+        binding.etTime.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(text: Editable?) {
                 val value = text?.toString()?.toIntOrNull()
                 if (value == null || value <= 0) {
-                    timeLayout.error = "Enter a valid time"
+                    binding.timeTextField.error = "Enter a valid time"
                     timeValidated = false
                 } else {
-                    timeLayout.error = null
+                    binding.timeTextField.error = null
                     timeValidated = true
                 }
                 updateButtonState()
             }
         })
 
-        val servingsLayout = view.findViewById<TextInputLayout>(R.id.servingsTextField)
-        val servingsField = view.findViewById<TextInputEditText>(R.id.etServings)
-        servingsField.addTextChangedListener(object : TextWatcher {
+        binding.etServings.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(text: Editable?) {
                 val value = text?.toString()?.toIntOrNull()
                 if (value == null || value <= 0) {
-                    servingsLayout.error = "Enter a valid servings amount"
+                    binding.servingsTextField.error = "Enter a valid servings amount"
                     servingsValidated = false
                 } else {
-                    servingsLayout.error = null
+                    binding.servingsTextField.error = null
                     servingsValidated = true
                 }
                 updateButtonState()
             }
         })
 
-        val ingredientsRecyclerView = view.findViewById<RecyclerView>(R.id.ingredientsRecyclerView)
-        val emptyIngredient = view.findViewById<LinearLayout>(R.id.emptyIngredient)
-        ingredientsCountText = view.findViewById(R.id.ingredientsCount)
-
         fun updateIngredientsCount() {
             val count = ingredients.size
             if (count > 0) {
-                emptyIngredient.visibility = View.GONE
-                ingredientsRecyclerView.visibility = View.VISIBLE
+                binding.emptyIngredient.visibility = View.GONE
+                binding.ingredientsRecyclerView.visibility = View.VISIBLE
             } else {
-                emptyIngredient.visibility = View.VISIBLE
-                ingredientsRecyclerView.visibility = View.GONE
+                binding.emptyIngredient.visibility = View.VISIBLE
+                binding.ingredientsRecyclerView.visibility = View.GONE
             }
-            ingredientsCountText.text = "$count items"
+            binding.ingredientsCount.text = "$count items"
             updateButtonState()
         }
 
         ingredientRecyclerAdapter = IngredientAdapter(ingredients) { updateIngredientsCount() }
-        ingredientsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        ingredientsRecyclerView.adapter = ingredientRecyclerAdapter
+        binding.ingredientsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.ingredientsRecyclerView.adapter = ingredientRecyclerAdapter
 
-        view.findViewById<LinearLayout>(R.id.addIngredientButton).setOnClickListener {
+        binding.addIngredientButton.setOnClickListener {
             ingredients.add(Ingredient())
             ingredientRecyclerAdapter.notifyItemInserted(ingredients.size - 1)
             updateIngredientsCount()
         }
 
         val ingredientTouchHelper = ItemTouchHelper(object :
-            ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0){
+            ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -219,77 +208,69 @@ class CreateRecipeFragment : Fragment(R.layout.fragment_create_recipe) {
                 ingredientRecyclerAdapter.moveItem(viewHolder.adapterPosition, target.adapterPosition)
                 return true
             }
-
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
         })
-
-        ingredientTouchHelper.attachToRecyclerView(ingredientsRecyclerView)
-
-        val stepsRecyclerView = view.findViewById<RecyclerView>(R.id.stepsRecyclerView)
-        val emptyStep = view.findViewById<LinearLayout>(R.id.emptyStep)
+        ingredientTouchHelper.attachToRecyclerView(binding.ingredientsRecyclerView)
 
         fun updateStepsCount() {
             if (steps.size > 0) {
-                emptyStep.visibility = View.GONE
-                stepsRecyclerView.visibility = View.VISIBLE
+                binding.emptyStep.visibility = View.GONE
+                binding.stepsRecyclerView.visibility = View.VISIBLE
             } else {
-                emptyStep.visibility = View.VISIBLE
-                stepsRecyclerView.visibility = View.GONE
+                binding.emptyStep.visibility = View.VISIBLE
+                binding.stepsRecyclerView.visibility = View.GONE
             }
             updateButtonState()
         }
 
         stepsRecyclerAdapter = StepAdapter(steps) { updateStepsCount() }
-        stepsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        stepsRecyclerView.adapter = stepsRecyclerAdapter
+        binding.stepsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.stepsRecyclerView.adapter = stepsRecyclerAdapter
 
-        view.findViewById<LinearLayout>(R.id.addStepButton).setOnClickListener {
+        binding.addStepButton.setOnClickListener {
             steps.add(Step())
             stepsRecyclerAdapter.notifyItemInserted(steps.size - 1)
             updateStepsCount()
         }
 
-        tagsGroup = view.findViewById(R.id.tagsGroup)
         listOf("Easy Meal", "Vegan", "Under 30m", "Breakfast").forEach {
-            tagsGroup.addView(createTag(it))
+            binding.tagsGroup.addView(createTag(it))
         }
 
-        val tagInput = view.findViewById<EditText>(R.id.tagInput)
-        tagInput.addTextChangedListener(object : TextWatcher {
+        binding.tagInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
             override fun afterTextChanged(s: Editable?) {
                 val text = s?.toString() ?: ""
                 val minWidth = (44 * resources.displayMetrics.density).toInt()
-                val newWidth = maxOf(minWidth, tagInput.paint.measureText(text).toInt() + (32 * resources.displayMetrics.density).toInt())
-                tagInput.layoutParams = tagInput.layoutParams.also { it.width = newWidth }
+                val newWidth = maxOf(minWidth, binding.tagInput.paint.measureText(text).toInt() + (32 * resources.displayMetrics.density).toInt())
+                binding.tagInput.layoutParams = binding.tagInput.layoutParams.also { it.width = newWidth }
             }
         })
 
-        tagInput.setOnFocusChangeListener { _, hasFocus ->
-            tagInput.hint = if (!hasFocus && tagInput.text.isNullOrEmpty()) "+" else ""
+        binding.tagInput.setOnFocusChangeListener { _, hasFocus ->
+            binding.tagInput.hint = if (!hasFocus && binding.tagInput.text.isNullOrEmpty()) "+" else ""
         }
 
-        tagInput.setOnEditorActionListener { _, _, _ ->
-            val text = tagInput.text.toString().trim()
+        binding.tagInput.setOnEditorActionListener { _, _, _ ->
+            val text = binding.tagInput.text.toString().trim()
             if (text.isNotEmpty()) {
-                tagsGroup.addView(createTag(text, true), tagsGroup.childCount)
-                tagInput.text.clear()
+                binding.tagsGroup.addView(createTag(text, true), binding.tagsGroup.childCount)
+                binding.tagInput.text.clear()
             }
             true
         }
 
-        publishButton.setOnClickListener {
-            val title = titleField.text.toString().trim()
-            val time = timeField.text.toString().toInt()
-            val servings = servingsField.text.toString().toInt()
-            val difficulty = difficultyDropdown.text.toString()
+        binding.btnLogin.setOnClickListener {
+            val title = binding.etTitle.text.toString().trim()
+            val time = binding.etTime.text.toString().toInt()
+            val servings = binding.etServings.text.toString().toInt()
+            val difficulty = binding.etDifficulty.text.toString()
             val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
 
             val tags = mutableListOf<String>()
-            for (tagIndex in 0 until tagsGroup.childCount) {
-                val tag = tagsGroup.getChildAt(tagIndex)
+            for (tagIndex in 0 until binding.tagsGroup.childCount) {
+                val tag = binding.tagsGroup.getChildAt(tagIndex)
                 if (tag is Chip && tag.isChecked) {
                     tags.add(tag.text.toString().removePrefix("# "))
                 }

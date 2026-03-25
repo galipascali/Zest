@@ -1,35 +1,27 @@
 package com.example.zest.ui.recipe
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.zest.R
+import com.example.zest.databinding.IngredientDetailItemBinding
 import com.example.zest.model.Ingredient
 
 class IngredientDetailAdapter(private val ingredients: List<Ingredient>) :
     RecyclerView.Adapter<IngredientDetailAdapter.ViewHolder>() {
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val qty: TextView = view.findViewById(R.id.ingredientsQty)
-        val name: TextView = view.findViewById(R.id.ingredientsTitle)
-        val number: TextView = view.findViewById(R.id.ingredientNumber)
-
-    }
+    class ViewHolder(val binding: IngredientDetailItemBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.ingredient_detail_item, parent, false)
-        return ViewHolder(view)
+        val binding = IngredientDetailItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun getItemCount() = ingredients.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val ingredient = ingredients[position]
-        holder.qty.text = ingredient.quantity.ifBlank { "-" }
-        holder.name.text = ingredient.name
-        holder.number.text = (position + 1).toString()
+        holder.binding.ingredientsQty.text = ingredient.quantity.ifBlank { "-" }
+        holder.binding.ingredientsTitle.text = ingredient.name
+        holder.binding.ingredientNumber.text = (position + 1).toString()
     }
 }

@@ -2,45 +2,47 @@ package com.example.zest.ui.profile
 
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.ImageButton
-import android.widget.TextView
+import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.R
+import com.example.zest.databinding.DialogEditProfileBinding
+import com.example.zest.databinding.FragmentProfileBinding
+import com.example.zest.model.User
 import com.example.zest.utils.loadImage
 import com.example.zest.utils.showImagePickerDialog
 import com.example.zest.utils.showLoading
-import com.example.zest.model.User
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.textfield.TextInputEditText
 import com.squareup.picasso.Picasso
 
-class ProfileFragment : Fragment(R.layout.fragment_profile) {
+class ProfileFragment : Fragment() {
+
+    private var _binding: FragmentProfileBinding? = null
+    private val binding get() = _binding!!
 
     private val viewModel: ProfileViewModel by viewModels()
 
     private var currentUser: User? = null
     private var pendingPhotoUri: Uri? = null
-    private var dialogAvatarView: ShapeableImageView? = null
+    private var dialogBinding: DialogEditProfileBinding? = null
     private lateinit var cameraUri: Uri
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
             pendingPhotoUri = it
-            dialogAvatarView?.let { av -> Picasso.get().load(it).into(av) }
+            dialogBinding?.dialogAvatar?.let { av -> Picasso.get().load(it).into(av) }
         }
     }
 
     private val takePhotoLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
             pendingPhotoUri = cameraUri
-            dialogAvatarView?.let { av -> Picasso.get().load(cameraUri).into(av) }
+            dialogBinding?.dialogAvatar?.let { av -> Picasso.get().load(cameraUri).into(av) }
         }
     }
 
@@ -50,39 +52,42 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentProfileBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        dialogBinding = null
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         showLoading(true)
 
-        val userAvatar = view.findViewById<ShapeableImageView>(R.id.userAvatar)
-        val usernameView = view.findViewById<TextView>(R.id.username)
-        val emailView = view.findViewById<TextView>(R.id.email)
-        val bioView = view.findViewById<TextView>(R.id.bio)
-        val btnEditProfile = view.findViewById<ImageButton>(R.id.btnEditProfile)
-        val btnLogout = view.findViewById<ImageButton>(R.id.btnLogout)
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recipes)
-
         val adapter = ProfileRecipeAdapter { recipe ->
             val action = ProfileFragmentDirections.actionProfileToRecipeDetail(recipe.id)
             findNavController().navigate(action)
         }
-        recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
-        recyclerView.adapter = adapter
+        binding.recipes.layoutManager = GridLayoutManager(requireContext(), 2)
+        binding.recipes.adapter = adapter
 
         viewModel.recipes.observe(viewLifecycleOwner) { adapter.submitList(it) }
 
         viewModel.user.observe(viewLifecycleOwner) { profile ->
             currentUser = profile
-            emailView.text = profile.email
-            usernameView.text = profile.displayName
-            bioView.text = profile.bio
-            bioView.visibility = if (profile.bio.isBlank()) View.GONE else View.VISIBLE
-            userAvatar.loadImage(profile.photoUrl)
+            binding.email.text = profile.email
+            binding.username.text = profile.displayName
+            binding.bio.text = profile.bio
+            binding.bio.visibility = if (profile.bio.isBlank()) View.GONE else View.VISIBLE
+            binding.userAvatar.loadImage(profile.photoUrl)
             showLoading(false)
         }
 
-        btnLogout.setOnClickListener {
+        binding.btnLogout.setOnClickListener {
             MaterialAlertDialogBuilder(requireContext())
                 .setMessage("Are you sure you want to logout?")
                 .setPositiveButton("Logout") { _, _ ->
@@ -93,33 +98,30 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 .show()
         }
 
-        btnEditProfile.setOnClickListener {
+        binding.btnEditProfile.setOnClickListener {
             pendingPhotoUri = null
             currentUser?.let { profile ->
-                val dialogView = layoutInflater.inflate(R.layout.dialog_edit_profile, null)
-                val nameInput = dialogView.findViewById<TextInputEditText>(R.id.etDisplayName)
-                val bioInput = dialogView.findViewById<TextInputEditText>(R.id.etBio)
-                val avatarView = dialogView.findViewById<ShapeableImageView>(R.id.dialogAvatar)
-                dialogAvatarView = avatarView
+                val db = DialogEditProfileBinding.inflate(layoutInflater)
+                dialogBinding = db
 
-                nameInput.setText(profile.displayName)
-                bioInput.setText(profile.bio)
-                avatarView.loadImage(profile.photoUrl)
-                avatarView.setOnClickListener { showImagePickerDialog() }
+                db.etDisplayName.setText(profile.displayName)
+                db.etBio.setText(profile.bio)
+                db.dialogAvatar.loadImage(profile.photoUrl)
+                db.dialogAvatar.setOnClickListener { showImagePickerDialog() }
 
                 MaterialAlertDialogBuilder(requireContext())
-                    .setView(dialogView)
+                    .setView(db.root)
                     .setPositiveButton("Save") { _, _ ->
                         viewModel.updateProfile(
-                            name = nameInput.text.toString().trim(),
-                            bio = bioInput.text.toString().trim(),
+                            name = db.etDisplayName.text.toString().trim(),
+                            bio = db.etBio.text.toString().trim(),
                             photoUri = pendingPhotoUri
                         )
-                        dialogAvatarView = null
+                        dialogBinding = null
                         pendingPhotoUri = null
                     }
                     .setNegativeButton("Cancel") { _, _ ->
-                        dialogAvatarView = null
+                        dialogBinding = null
                         pendingPhotoUri = null
                     }
                     .show()

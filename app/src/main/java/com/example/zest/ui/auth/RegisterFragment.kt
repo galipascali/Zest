@@ -3,187 +3,139 @@ package com.example.zest.ui.auth
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Patterns
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import com.example.zest.utils.afterTextChanged
-import com.example.zest.utils.showLoading
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.zest.R
-import com.google.android.material.button.MaterialButton
+import com.example.zest.databinding.FragmentRegisterBinding
+import com.example.zest.utils.afterTextChanged
+import com.example.zest.utils.showLoading
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import com.google.firebase.firestore.FirebaseFirestore
 
-class RegisterFragment : Fragment(R.layout.fragment_register) {
+class RegisterFragment : Fragment() {
+
+    private var _binding: FragmentRegisterBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentRegisterBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val btnLogin = view.findViewById<MaterialButton>(R.id.btnLogin)
-        val btnSignup = view.findViewById<MaterialButton>(R.id.btnSignup)
-        val backArrow = view.findViewById<MaterialButton>(R.id.back_arrow)
-        val emailField = view.findViewById<TextInputEditText>(R.id.etEmail)
-        val passwordField = view.findViewById<TextInputEditText>(R.id.etPassword)
-        val confirmPasswordField = view.findViewById<TextInputEditText>(R.id.etConfirmPassword)
-        val emailLayout = view.findViewById<TextInputLayout>(R.id.emailTextField)
-        val passwordLayout = view.findViewById<TextInputLayout>(R.id.passwordTextField)
-        val confirmPasswordLayout =
-            view.findViewById<TextInputLayout>(R.id.confirmPasswordTextField)
-        fun showLoading(show: Boolean) {
-            this.showLoading(show)
-            btnLogin.isEnabled = !show
-        }
-
         var emailValidated = false
         var passwordValidated = false
         var confirmPasswordValidated = false
+        fun isFormValid() = emailValidated && passwordValidated && confirmPasswordValidated
 
-        fun isFormValid(): Boolean {
-            return emailValidated && passwordValidated && confirmPasswordValidated
+        fun showLoading(show: Boolean) {
+            this.showLoading(show)
+            binding.btnLogin.isEnabled = !show
         }
-
 
         suspend fun saveUserToFirestore(userId: String, email: String): Boolean {
             return try {
-
-                val user = hashMapOf(
-                    "uid" to userId,
-                    "email" to email,
-                    "createdAt" to System.currentTimeMillis()
-                )
-
-                FirebaseFirestore
-                    .getInstance()
-                    .collection("users")
-                    .document(userId)
-                    .set(user)
+                FirebaseFirestore.getInstance().collection("users").document(userId)
+                    .set(hashMapOf("uid" to userId, "email" to email, "createdAt" to System.currentTimeMillis()))
                     .await()
-
                 true
-
-            } catch (e: Exception) {
-                false
-            }
+            } catch (e: Exception) { false }
         }
 
         suspend fun registerUser(): String? {
-            val email = emailField.text.toString()
-            val pass = passwordField.text.toString()
-
             return try {
-                val result = FirebaseAuth
-                    .getInstance()
-                    .createUserWithEmailAndPassword(email, pass)
-                    .await()
-
-                result.user?.uid
-
-            } catch (e: Exception) {
-                null
-            }
+                FirebaseAuth.getInstance()
+                    .createUserWithEmailAndPassword(binding.etEmail.text.toString(), binding.etPassword.text.toString())
+                    .await().user?.uid
+            } catch (e: Exception) { null }
         }
 
         fun confirmPasswordValidate() {
-            if (confirmPasswordField.text.toString() != passwordField.text.toString()) {
-                confirmPasswordLayout.error = "Passwords do not match"
+            if (binding.etConfirmPassword.text.toString() != binding.etPassword.text.toString()) {
+                binding.confirmPasswordTextField.error = "Passwords do not match"
                 confirmPasswordValidated = false
             } else {
-                confirmPasswordLayout.error = null
+                binding.confirmPasswordTextField.error = null
                 confirmPasswordValidated = true
             }
         }
 
-        btnSignup.setOnClickListener {
+        binding.btnSignup.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
                 showLoading(true)
-                btnSignup.isEnabled = false
-
+                binding.btnSignup.isEnabled = false
                 val uid = registerUser()
-
                 if (uid != null) {
-                    val email = emailField.text.toString()
-                    val saved = saveUserToFirestore(uid, email)
-
+                    val saved = saveUserToFirestore(uid, binding.etEmail.text.toString())
                     showLoading(false)
-                    btnSignup.isEnabled = true
-
+                    binding.btnSignup.isEnabled = true
                     if (saved) {
-                        val snackBar = Snackbar.make(view, "Registration Success", Snackbar.LENGTH_SHORT)
-                        snackBar.setBackgroundTint(Color.GREEN)
-                        snackBar.setTextColor(Color.WHITE)
-                        snackBar.show()
-
-                        findNavController().navigate(
-                            R.id.action_register_to_feed
-                        )
+                        Snackbar.make(view, "Registration Success", Snackbar.LENGTH_SHORT)
+                            .setBackgroundTint(Color.GREEN).setTextColor(Color.WHITE).show()
+                        findNavController().navigate(R.id.action_register_to_feed)
                     } else {
-                        val snackBar = Snackbar.make(view, "Registration failed", Snackbar.LENGTH_SHORT)
-                        snackBar.setBackgroundTint(Color.RED)
-                        snackBar.setTextColor(Color.WHITE)
-                        snackBar.show()
+                        Snackbar.make(view, "Registration failed", Snackbar.LENGTH_SHORT)
+                            .setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show()
                     }
                 } else {
                     showLoading(false)
-                    btnSignup.isEnabled = true
-
-                    val snackBar = Snackbar.make(view, "Registration failed", Snackbar.LENGTH_SHORT)
-                    snackBar.setBackgroundTint(Color.RED)
-                    snackBar.setTextColor(Color.WHITE)
-                    snackBar.show()
+                    binding.btnSignup.isEnabled = true
+                    Snackbar.make(view, "Registration failed", Snackbar.LENGTH_SHORT)
+                        .setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show()
                 }
             }
         }
 
-        btnLogin.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_register_to_login
-            )
-        }
+        binding.btnLogin.setOnClickListener { findNavController().navigate(R.id.action_register_to_login) }
+        binding.backArrow.setOnClickListener { findNavController().popBackStack() }
 
-        backArrow.setOnClickListener {
-            findNavController().popBackStack()
-        }
-
-        emailField.afterTextChanged { email ->
+        binding.etEmail.afterTextChanged { email ->
             if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                emailLayout.error = "Invalid email address"
+                binding.emailTextField.error = "Invalid email address"
                 emailValidated = false
             } else {
-                emailLayout.error = null
+                binding.emailTextField.error = null
                 emailValidated = true
             }
-            btnSignup.isEnabled = isFormValid()
+            binding.btnSignup.isEnabled = isFormValid()
         }
 
-        passwordField.afterTextChanged { password ->
+        binding.etPassword.afterTextChanged { password ->
             if (password.length < 6) {
-                passwordLayout.error = "Password must be at least 6 characters"
+                binding.passwordTextField.error = "Password must be at least 6 characters"
                 passwordValidated = false
             } else {
-                passwordLayout.error = null
+                binding.passwordTextField.error = null
                 passwordValidated = true
             }
             confirmPasswordValidate()
-            btnSignup.isEnabled = isFormValid()
+            binding.btnSignup.isEnabled = isFormValid()
         }
 
-        confirmPasswordField.afterTextChanged { _ ->
+        binding.etConfirmPassword.afterTextChanged {
             confirmPasswordValidate()
-            btnSignup.isEnabled = isFormValid()
+            binding.btnSignup.isEnabled = isFormValid()
         }
 
-        confirmPasswordField.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE && btnSignup.isEnabled) {
-                btnSignup.performClick()
-                true
+        binding.etConfirmPassword.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE && binding.btnSignup.isEnabled) {
+                binding.btnSignup.performClick(); true
             } else false
         }
-
     }
 }
