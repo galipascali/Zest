@@ -1,13 +1,12 @@
 package com.example.zest.ui.auth
 
-import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Patterns
 import com.example.zest.utils.afterTextChanged
+import com.example.zest.utils.showLoading
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.zest.R
@@ -32,12 +31,8 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val passwordField = view.findViewById<TextInputEditText>(R.id.etPassword)
         val emailLayout = view.findViewById<TextInputLayout>(R.id.emailTextField)
         val passwordLayout = view.findViewById<TextInputLayout>(R.id.passwordTextField)
-        val progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
-        val overlay = view.findViewById<View>(R.id.loadingOverlay)
-
         fun showLoading(show: Boolean) {
-            progressBar.visibility = if (show) View.VISIBLE else View.GONE
-            overlay.visibility = if (show) View.VISIBLE else View.GONE
+            this.showLoading(show)
             btnLogin.isEnabled = !show
         }
 
@@ -58,7 +53,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             btnLogin.isEnabled = false
 
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-                progressBar.visibility = View.GONE
+                showLoading(false)
                 btnLogin.isEnabled = true
 
                 if (task.isSuccessful) {

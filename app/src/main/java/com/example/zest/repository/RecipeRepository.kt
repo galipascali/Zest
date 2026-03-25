@@ -20,9 +20,7 @@ class RecipeRepository(context: Context) {
             val snapshot = firestore.collection("recipes").get().await()
             val recipes = snapshot.documents.mapNotNull { it.toObject(Recipe::class.java) }
             dao.upsertAll(recipes)
-        } catch (e: Exception) {
-            //TODO
-        }
+        } catch (e: Exception) {}
     }
 
     suspend fun syncUserRecipesFromFirestore(userId: String) {
@@ -32,16 +30,16 @@ class RecipeRepository(context: Context) {
                 .get().await()
             val recipes = snapshot.documents.mapNotNull { it.toObject(Recipe::class.java) }
             dao.upsertAll(recipes)
-        } catch (e: Exception) {
-            //TODO
-        }
+        } catch (e: Exception) {}
     }
 
     suspend fun addRecipe(recipe: Recipe): Boolean {
         return try {
+            val userDoc = firestore.collection("users").document(recipe.userId).get().await()
+            val creatorPhotoUrl = userDoc.getString("photoUrl") ?: ""
             val docRef = firestore.collection("recipes").document()
-            val recipeWithId = recipe.copy(id = docRef.id)
-            docRef.set(recipeWithId)
+            val recipeWithId = recipe.copy(id = docRef.id, creatorPhoto = creatorPhotoUrl)
+            docRef.set(recipeWithId).await()
             try { dao.upsert(recipeWithId) } catch (_: Exception) {}
             true
         } catch (e: Exception) {

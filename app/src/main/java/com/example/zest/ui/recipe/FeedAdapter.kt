@@ -1,7 +1,5 @@
 package com.example.zest.ui.recipe
 
-import android.graphics.BitmapFactory
-import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,10 +11,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.model.Recipe
 import com.example.zest.R
+import com.example.zest.utils.loadImage
 import com.google.android.material.imageview.ShapeableImageView
 
-class FeedAdapter(private val onItemClick: (Recipe) -> Unit) :
-    ListAdapter<Recipe, FeedAdapter.RecipeViewHolder>(DIFF_CALLBACK) {
+class FeedAdapter(
+    private val onItemClick: (Recipe) -> Unit
+) : ListAdapter<Recipe, FeedAdapter.RecipeViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Recipe>() {
@@ -36,7 +36,6 @@ class FeedAdapter(private val onItemClick: (Recipe) -> Unit) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.recipe_feed_item, parent, false)
-
         return RecipeViewHolder(view)
     }
 
@@ -45,20 +44,8 @@ class FeedAdapter(private val onItemClick: (Recipe) -> Unit) :
 
         holder.title.text = recipe.title
         holder.creator.text = recipe.creatorEmail.substringBefore("@")
-
-        if (recipe.imageUrl.isNotBlank()) {
-            try {
-                val bytes = Base64.decode(recipe.imageUrl, Base64.DEFAULT)
-                holder.image.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.size))
-            } catch (_: Exception) {}
-        }
-
-        if (recipe.creatorPhoto.isNotBlank()) {
-            try {
-                val bytes = Base64.decode(recipe.creatorPhoto, Base64.DEFAULT)
-                holder.avatar.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.size))
-            } catch (_: Exception) {}
-        }
+        holder.image.loadImage(recipe.imageUrl, R.drawable.welcome_background)
+        holder.avatar.loadImage(recipe.creatorPhoto)
 
         val apiTagTitle = holder.itemView.context.getString(R.string.api_tag_title)
         holder.apiTag.isVisible = recipe.creatorEmail.substringBefore("@") == apiTagTitle

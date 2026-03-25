@@ -10,10 +10,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.R
 import com.example.zest.model.Recipe
-import com.squareup.picasso.Picasso
+import com.example.zest.utils.loadImage
 
-class ProfileRecipeAdapter(private val onItemClick: (Recipe) -> Unit) :
-    ListAdapter<Recipe, ProfileRecipeAdapter.ViewHolder>(DIFF_CALLBACK) {
+class ProfileRecipeAdapter(
+    private val onItemClick: (Recipe) -> Unit
+) : ListAdapter<Recipe, ProfileRecipeAdapter.ViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Recipe>() {
@@ -37,11 +38,7 @@ class ProfileRecipeAdapter(private val onItemClick: (Recipe) -> Unit) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         holder.title.text = item.title
-        Picasso.get()
-            .load(item.imageUrl.ifBlank { null })
-            .placeholder(R.drawable.welcome_background)
-            .error(R.drawable.welcome_background)
-            .into(holder.img)
+        holder.img.loadImage(item.imageUrl, R.drawable.welcome_background)
         holder.itemView.setOnClickListener { onItemClick(item) }
     }
 }
