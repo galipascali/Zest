@@ -9,7 +9,6 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
-
 import androidx.core.graphics.scale
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -23,7 +22,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
 import java.io.ByteArrayOutputStream
-
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
