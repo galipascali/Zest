@@ -1,6 +1,7 @@
 package com.example.zest.ui.profile
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.zest.model.Recipe
 import com.example.zest.model.User
 import com.example.zest.repository.RecipeRepository
+import com.example.zest.utils.uploadImageToStorage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
@@ -38,29 +40,34 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     email = email,
                     displayName = displayName,
                     bio = doc.getString("bio") ?: "",
-                    photoBase64 = doc.getString("photoBase64")
+                    photoUrl = doc.getString("photoUrl") ?: ""
                 )
             }
     }
 
-    fun updateProfile(name: String, bio: String, photoBase64: String?) {
-        val currentUser = auth.currentUser ?: return
+    fun updateProfile(name: String, bio: String, photoUri: Uri? = null) {
+        viewModelScope.launch {
+            val photoUrl = photoUri?.let {
+                uploadImageToStorage(getApplication(), it, "profile_photos/$userId.jpg")
+            }
 
-        if (name.isNotEmpty()) {
-            val request = UserProfileChangeRequest.Builder().setDisplayName(name).build()
-            currentUser.updateProfile(request)
+            val updates = mutableMapOf<String, Any>("bio" to bio)
+            photoUrl?.let { updates["photoUrl"] = it }
+            firestore.collection("users").document(userId).set(updates, SetOptions.merge())
+
+            val currentUser = auth.currentUser ?: return@launch
+            if (name.isNotEmpty()) {
+                val request = UserProfileChangeRequest.Builder().setDisplayName(name).build()
+                currentUser.updateProfile(request)
+            }
+
+            val current = user.value ?: User()
+            user.value = current.copy(
+                displayName = name.ifEmpty { current.displayName },
+                bio = bio,
+                photoUrl = photoUrl ?: current.photoUrl
+            )
         }
-
-        val updates = mutableMapOf<String, Any>("bio" to bio)
-        photoBase64?.let { updates["photoBase64"] = it }
-        firestore.collection("users").document(userId).set(updates, SetOptions.merge())
-
-        val current = user.value ?: User()
-        user.value = current.copy(
-            displayName = name.ifEmpty { current.displayName },
-            bio = bio,
-            photoBase64 = photoBase64 ?: current.photoBase64
-        )
     }
 
     fun signOut() {

@@ -12,7 +12,8 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.R
-import com.squareup.picasso.Picasso
+import com.example.zest.utils.loadImageWithCallback
+import com.example.zest.utils.showLoading
 
 class RecipeDetailFragment : Fragment(R.layout.fragment_recipe_detail) {
 
@@ -60,12 +61,9 @@ class RecipeDetailFragment : Fragment(R.layout.fragment_recipe_detail) {
             difficulty.text = recipe.difficulty
             servings.text = "${recipe.servings} ppl"
 
-
-            Picasso.get()
-                .load(recipe.imageUrl.ifBlank { null })
-                .placeholder(R.drawable.welcome_background)
-                .error(R.drawable.welcome_background)
-                .into(image)
+            image.loadImageWithCallback(recipe.imageUrl, R.drawable.welcome_background) {
+                showLoading(false)
+            }
 
             ingredientsRecycler.adapter = IngredientDetailAdapter(recipe.ingredients)
             stepsRecycler.adapter = StepDetailAdapter(recipe.steps)

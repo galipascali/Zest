@@ -1,54 +1,48 @@
 package com.example.zest.ui.profile
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
-import android.util.Base64
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
-import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.graphics.scale
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.R
+import com.example.zest.utils.loadImage
+import com.example.zest.utils.loadImageWithCallback
 import com.example.zest.utils.showImagePickerDialog
+import com.example.zest.utils.showLoading
 import com.example.zest.model.User
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
-import java.io.ByteArrayOutputStream
+import com.squareup.picasso.Picasso
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private val viewModel: ProfileViewModel by viewModels()
 
     private var currentUser: User? = null
-    private var pendingPhotoBase64: String? = null
+    private var pendingPhotoUri: Uri? = null
     private var dialogAvatarView: ShapeableImageView? = null
     private lateinit var cameraUri: Uri
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let { processImage(it) }
+        uri?.let {
+            pendingPhotoUri = it
+            dialogAvatarView?.let { av -> Picasso.get().load(it).into(av) }
+        }
     }
 
     private val takePhotoLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        if (success) processImage(cameraUri)
-    }
-
-    private fun processImage(uri: Uri) {
-        val stream = requireContext().contentResolver.openInputStream(uri) ?: return
-        val original = BitmapFactory.decodeStream(stream)
-        stream.close()
-        val scaled = original.scale(200, 200)
-        val out = ByteArrayOutputStream()
-        scaled.compress(Bitmap.CompressFormat.JPEG, 70, out)
-        pendingPhotoBase64 = Base64.encodeToString(out.toByteArray(), Base64.DEFAULT)
-        dialogAvatarView?.setImageBitmap(scaled)
+        if (success) {
+            pendingPhotoUri = cameraUri
+            dialogAvatarView?.let { av -> Picasso.get().load(cameraUri).into(av) }
+        }
     }
 
     private fun showImagePickerDialog() {
@@ -60,6 +54,8 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        showLoading(true)
+
         val userAvatar = view.findViewById<ShapeableImageView>(R.id.userAvatar)
         val usernameView = view.findViewById<TextView>(R.id.username)
         val emailView = view.findViewById<TextView>(R.id.email)
@@ -68,10 +64,17 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val btnLogout = view.findViewById<ImageButton>(R.id.btnLogout)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recipes)
 
-        val adapter = ProfileRecipeAdapter { recipe ->
-            val action = ProfileFragmentDirections.actionProfileToRecipeDetail(recipe.id)
-            findNavController().navigate(action)
-        }
+        var userReady = false
+        var recipesReady = false
+        fun checkAllReady() { if (userReady && recipesReady) showLoading(false) }
+
+        val adapter = ProfileRecipeAdapter(
+            onItemClick = { recipe ->
+                val action = ProfileFragmentDirections.actionProfileToRecipeDetail(recipe.id)
+                findNavController().navigate(action)
+            },
+            onImagesLoaded = { recipesReady = true; checkAllReady() }
+        )
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         recyclerView.adapter = adapter
 
@@ -83,8 +86,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             usernameView.text = profile.displayName
             bioView.text = profile.bio
             bioView.visibility = if (profile.bio.isBlank()) View.GONE else View.VISIBLE
-            profile.photoBase64?.let { b64 ->
-                decodeBase64ToBitmap(b64)?.let { userAvatar.setImageBitmap(it) }
+            userAvatar.loadImageWithCallback(profile.photoUrl) {
+                userReady = true
+                checkAllReady()
             }
         }
 
@@ -100,7 +104,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
 
         btnEditProfile.setOnClickListener {
-            pendingPhotoBase64 = null
+            pendingPhotoUri = null
             currentUser?.let { profile ->
                 val dialogView = layoutInflater.inflate(R.layout.dialog_edit_profile, null)
                 val nameInput = dialogView.findViewById<TextInputEditText>(R.id.etDisplayName)
@@ -110,10 +114,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
                 nameInput.setText(profile.displayName)
                 bioInput.setText(profile.bio)
-
-                val currentBitmap = (userAvatar.drawable as? android.graphics.drawable.BitmapDrawable)?.bitmap
-                currentBitmap?.let { avatarView.setImageBitmap(it) }
-
+                avatarView.loadImage(profile.photoUrl)
                 avatarView.setOnClickListener { showImagePickerDialog() }
 
                 MaterialAlertDialogBuilder(requireContext())
@@ -122,22 +123,17 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                         viewModel.updateProfile(
                             name = nameInput.text.toString().trim(),
                             bio = bioInput.text.toString().trim(),
-                            photoBase64 = pendingPhotoBase64
+                            photoUri = pendingPhotoUri
                         )
                         dialogAvatarView = null
+                        pendingPhotoUri = null
                     }
-                    .setNegativeButton("Cancel") { _, _ -> dialogAvatarView = null }
+                    .setNegativeButton("Cancel") { _, _ ->
+                        dialogAvatarView = null
+                        pendingPhotoUri = null
+                    }
                     .show()
             }
-        }
-    }
-
-    private fun decodeBase64ToBitmap(base64: String): Bitmap? {
-        return try {
-            val bytes = Base64.decode(base64, Base64.DEFAULT)
-            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-        } catch (e: Exception) {
-            null
         }
     }
 }

@@ -10,15 +10,45 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.R
 import com.example.zest.model.Recipe
-import com.squareup.picasso.Picasso
+import com.example.zest.utils.loadImageWithCallback
 
-class ProfileRecipeAdapter(private val onItemClick: (Recipe) -> Unit) :
-    ListAdapter<Recipe, ProfileRecipeAdapter.ViewHolder>(DIFF_CALLBACK) {
+class ProfileRecipeAdapter(
+    private val onItemClick: (Recipe) -> Unit,
+    private val onImagesLoaded: (() -> Unit)? = null
+) : ListAdapter<Recipe, ProfileRecipeAdapter.ViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Recipe>() {
             override fun areItemsTheSame(oldItem: Recipe, newItem: Recipe) = oldItem.id == newItem.id
             override fun areContentsTheSame(oldItem: Recipe, newItem: Recipe) = oldItem == newItem
+        }
+    }
+
+    private var expectedImages = 0
+    private var loadedImages = 0
+    private var callbackFired = false
+
+    override fun submitList(list: List<Recipe>?) {
+        if (!list.isNullOrEmpty()) {
+            callbackFired = false
+            expectedImages = list.count { it.imageUrl.isNotBlank() }
+            loadedImages = 0
+            if (expectedImages == 0) {
+                callbackFired = true
+                onImagesLoaded?.invoke()
+            }
+        } else if (list != null) {
+            onImagesLoaded?.invoke()
+        }
+        super.submitList(list)
+    }
+
+    private fun onImageResult() {
+        if (callbackFired) return
+        loadedImages++
+        if (loadedImages >= expectedImages) {
+            callbackFired = true
+            onImagesLoaded?.invoke()
         }
     }
 
@@ -37,11 +67,7 @@ class ProfileRecipeAdapter(private val onItemClick: (Recipe) -> Unit) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         holder.title.text = item.title
-        Picasso.get()
-            .load(item.imageUrl.ifBlank { null })
-            .placeholder(R.drawable.welcome_background)
-            .error(R.drawable.welcome_background)
-            .into(holder.img)
+        holder.img.loadImageWithCallback(item.imageUrl, R.drawable.welcome_background) { onImageResult() }
         holder.itemView.setOnClickListener { onItemClick(item) }
     }
 }

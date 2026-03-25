@@ -1,7 +1,7 @@
 package com.example.zest.ui.feed
 
-import android.view.View
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.R
 import com.example.zest.ui.recipe.FeedAdapter
 import com.example.zest.utils.afterTextChanged
+import com.example.zest.utils.showLoading
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.TextInputEditText
@@ -23,15 +24,19 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        showLoading(true)
+
         val recycler = view.findViewById<RecyclerView>(R.id.feedRecyclerView)
         val categoryChips = view.findViewById<ChipGroup>(R.id.categoryChips)
         val searchInput = view.findViewById<TextInputEditText>(R.id.searchInput)
         val filterButton = view.findViewById<ImageButton>(R.id.filterButton)
-
-        val adapter = FeedAdapter { recipe ->
-            val action = FeedFragmentDirections.actionFeedToRecipeDetail(recipe.id)
-            findNavController().navigate(action)
-        }
+        val adapter = FeedAdapter(
+            onItemClick = { recipe ->
+                val action = FeedFragmentDirections.actionFeedToRecipeDetail(recipe.id)
+                findNavController().navigate(action)
+            },
+            onImagesLoaded = { showLoading(false) }
+        )
         recycler.layoutManager = LinearLayoutManager(requireContext())
         recycler.adapter = adapter
 

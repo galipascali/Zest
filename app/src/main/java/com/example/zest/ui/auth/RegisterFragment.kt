@@ -6,7 +6,7 @@ import android.util.Patterns
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import com.example.zest.utils.afterTextChanged
-import android.widget.ProgressBar
+import com.example.zest.utils.showLoading
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -19,7 +19,6 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
 
 class RegisterFragment : Fragment(R.layout.fragment_register) {
 
@@ -36,12 +35,8 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         val passwordLayout = view.findViewById<TextInputLayout>(R.id.passwordTextField)
         val confirmPasswordLayout =
             view.findViewById<TextInputLayout>(R.id.confirmPasswordTextField)
-        val progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
-        val overlay = view.findViewById<View>(R.id.loadingOverlay)
-
         fun showLoading(show: Boolean) {
-            progressBar.visibility = if (show) View.VISIBLE else View.GONE
-            overlay.visibility = if (show) View.VISIBLE else View.GONE
+            this.showLoading(show)
             btnLogin.isEnabled = !show
         }
 
