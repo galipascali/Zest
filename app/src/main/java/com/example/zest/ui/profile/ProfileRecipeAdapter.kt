@@ -29,27 +29,16 @@ class ProfileRecipeAdapter(
     private var callbackFired = false
 
     override fun submitList(list: List<Recipe>?) {
-        if (!list.isNullOrEmpty()) {
-            callbackFired = false
-            expectedImages = list.count { it.imageUrl.isNotBlank() }
-            loadedImages = 0
-            if (expectedImages == 0) {
-                callbackFired = true
-                onImagesLoaded?.invoke()
-            }
-        } else if (list != null) {
-            onImagesLoaded?.invoke()
-        }
+        callbackFired = false
+        loadedImages = 0
+        expectedImages = list?.count { it.imageUrl.isNotBlank() } ?: 0
+        if (expectedImages == 0) { callbackFired = true; onImagesLoaded?.invoke() }
         super.submitList(list)
     }
 
     private fun onImageResult() {
         if (callbackFired) return
-        loadedImages++
-        if (loadedImages >= expectedImages) {
-            callbackFired = true
-            onImagesLoaded?.invoke()
-        }
+        if (++loadedImages >= expectedImages) { callbackFired = true; onImagesLoaded?.invoke() }
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

@@ -15,13 +15,9 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
 
     val filter = MutableLiveData(RecipeFilter())
     val filteredRecipes = MutableLiveData<List<Recipe>>(emptyList())
-    val isLoading = MutableLiveData(true)
 
     init {
-        viewModelScope.launch {
-            repository.syncFromFirestore()
-            isLoading.postValue(false)
-        }
+        viewModelScope.launch { repository.syncFromFirestore() }
 
         repository.getAllRecipes().observeForever { recipes ->
             allRecipes.value = recipes

@@ -49,20 +49,20 @@ fun Fragment.showImagePickerDialog(
         .show()
 }
 
+private fun buildPicassoRequest(url: String, placeholder: Int): com.squareup.picasso.RequestCreator? {
+    if (url.isBlank()) return null
+    val request = if (url.startsWith("http")) Picasso.get().load(url) else Picasso.get().load(File(url))
+    if (placeholder != 0) request.placeholder(placeholder)
+    return request
+}
+
 fun ImageView.loadImage(url: String, placeholder: Int = 0) {
-    if (url.isBlank()) return
-    val creator = if (url.startsWith("http")) Picasso.get().load(url)
-                  else Picasso.get().load(File(url))
-    if (placeholder != 0) creator.placeholder(placeholder)
-    creator.into(this)
+    buildPicassoRequest(url, placeholder)?.into(this)
 }
 
 fun ImageView.loadImageWithCallback(url: String, placeholder: Int = 0, onDone: () -> Unit) {
-    if (url.isBlank()) { onDone(); return }
-    val creator = if (url.startsWith("http")) Picasso.get().load(url)
-                  else Picasso.get().load(File(url))
-    if (placeholder != 0) creator.placeholder(placeholder)
-    creator.into(this, object : com.squareup.picasso.Callback {
+    val request = buildPicassoRequest(url, placeholder) ?: run { onDone(); return }
+    request.into(this, object : com.squareup.picasso.Callback {
         override fun onSuccess() = onDone()
         override fun onError(e: Exception?) = onDone()
     })

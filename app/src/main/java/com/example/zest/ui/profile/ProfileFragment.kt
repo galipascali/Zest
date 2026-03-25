@@ -56,6 +56,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
         showLoading(true)
 
+        val profileContent = view.findViewById<View>(R.id.profileContent)
         val userAvatar = view.findViewById<ShapeableImageView>(R.id.userAvatar)
         val usernameView = view.findViewById<TextView>(R.id.username)
         val emailView = view.findViewById<TextView>(R.id.email)
@@ -66,14 +67,18 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
         var userReady = false
         var recipesReady = false
-        fun checkAllReady() { if (userReady && recipesReady) showLoading(false) }
+        fun revealIfReady() {
+            if (!userReady || !recipesReady) return
+            showLoading(false)
+            profileContent.visibility = View.VISIBLE
+        }
 
         val adapter = ProfileRecipeAdapter(
             onItemClick = { recipe ->
                 val action = ProfileFragmentDirections.actionProfileToRecipeDetail(recipe.id)
                 findNavController().navigate(action)
             },
-            onImagesLoaded = { recipesReady = true; checkAllReady() }
+            onImagesLoaded = { recipesReady = true; revealIfReady() }
         )
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         recyclerView.adapter = adapter
@@ -88,7 +93,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             bioView.visibility = if (profile.bio.isBlank()) View.GONE else View.VISIBLE
             userAvatar.loadImageWithCallback(profile.photoUrl) {
                 userReady = true
-                checkAllReady()
+                revealIfReady()
             }
         }
 

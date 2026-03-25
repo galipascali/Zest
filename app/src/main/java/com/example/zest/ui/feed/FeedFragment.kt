@@ -24,18 +24,27 @@ class FeedFragment : Fragment(R.layout.fragment_feed) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        showLoading(true)
+
+        val feedContent = view.findViewById<View>(R.id.feedContent)
         val recycler = view.findViewById<RecyclerView>(R.id.feedRecyclerView)
         val categoryChips = view.findViewById<ChipGroup>(R.id.categoryChips)
         val searchInput = view.findViewById<TextInputEditText>(R.id.searchInput)
         val filterButton = view.findViewById<ImageButton>(R.id.filterButton)
-        val adapter = FeedAdapter { recipe ->
-            val action = FeedFragmentDirections.actionFeedToRecipeDetail(recipe.id)
-            findNavController().navigate(action)
-        }
+
+        val adapter = FeedAdapter(
+            onItemClick = { recipe ->
+                val action = FeedFragmentDirections.actionFeedToRecipeDetail(recipe.id)
+                findNavController().navigate(action)
+            },
+            onImagesLoaded = {
+                showLoading(false)
+                feedContent.visibility = View.VISIBLE
+            }
+        )
         recycler.layoutManager = LinearLayoutManager(requireContext())
         recycler.adapter = adapter
 
-        viewModel.isLoading.observe(viewLifecycleOwner) { showLoading(it) }
         viewModel.filteredRecipes.observe(viewLifecycleOwner) { adapter.submitList(it) }
 
         searchInput.afterTextChanged { text ->

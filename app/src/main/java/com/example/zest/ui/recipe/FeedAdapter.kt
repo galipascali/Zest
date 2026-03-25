@@ -12,10 +12,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.model.Recipe
 import com.example.zest.R
 import com.example.zest.utils.loadImage
+import com.example.zest.utils.loadImageWithCallback
 import com.google.android.material.imageview.ShapeableImageView
 
 class FeedAdapter(
-    private val onItemClick: (Recipe) -> Unit
+    private val onItemClick: (Recipe) -> Unit,
+    private val onImagesLoaded: (() -> Unit)? = null
 ) : ListAdapter<Recipe, FeedAdapter.RecipeViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -23,6 +25,23 @@ class FeedAdapter(
             override fun areItemsTheSame(oldItem: Recipe, newItem: Recipe) = oldItem.id == newItem.id
             override fun areContentsTheSame(oldItem: Recipe, newItem: Recipe) = oldItem == newItem
         }
+    }
+
+    private var expectedImages = 0
+    private var loadedImages = 0
+    private var callbackFired = false
+
+    override fun submitList(list: List<Recipe>?) {
+        callbackFired = false
+        loadedImages = 0
+        expectedImages = list?.count { it.imageUrl.isNotBlank() } ?: 0
+        if (expectedImages == 0) { callbackFired = true; onImagesLoaded?.invoke() }
+        super.submitList(list)
+    }
+
+    private fun onImageResult() {
+        if (callbackFired) return
+        if (++loadedImages >= expectedImages) { callbackFired = true; onImagesLoaded?.invoke() }
     }
 
     class RecipeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -44,7 +63,11 @@ class FeedAdapter(
 
         holder.title.text = recipe.title
         holder.creator.text = recipe.creatorEmail.substringBefore("@")
-        holder.image.loadImage(recipe.imageUrl, R.drawable.welcome_background)
+        if (recipe.imageUrl.isNotBlank()) {
+            holder.image.loadImageWithCallback(recipe.imageUrl, R.drawable.welcome_background) { onImageResult() }
+        } else {
+            holder.image.setImageResource(R.drawable.welcome_background)
+        }
         holder.avatar.loadImage(recipe.creatorPhoto)
 
         val apiTagTitle = holder.itemView.context.getString(R.string.api_tag_title)

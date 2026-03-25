@@ -26,26 +26,23 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     init {
         viewModelScope.launch { repository.syncUserRecipesFromFirestore(userId) }
-        loadProfile()
-    }
 
-    fun loadProfile() {
-        val currentUser = auth.currentUser ?: return
-        val email = currentUser.email ?: ""
-        val displayName = currentUser.displayName?.ifBlank { null } ?: email.substringBefore("@")
-
-        firestore.collection("users").document(userId).get()
-            .addOnSuccessListener { doc ->
-                user.value = User(
-                    email = email,
-                    displayName = displayName,
-                    bio = doc.getString("bio") ?: "",
-                    photoUrl = doc.getString("photoUrl") ?: ""
-                )
-            }
-            .addOnFailureListener {
-                user.value = User(email = email, displayName = displayName)
-            }
+        auth.currentUser?.let { currentUser ->
+            val email = currentUser.email ?: ""
+            val displayName = currentUser.displayName?.ifBlank { null } ?: email.substringBefore("@")
+            firestore.collection("users").document(userId).get()
+                .addOnSuccessListener { doc ->
+                    user.value = User(
+                        email = email,
+                        displayName = displayName,
+                        bio = doc.getString("bio") ?: "",
+                        photoUrl = doc.getString("photoUrl") ?: ""
+                    )
+                }
+                .addOnFailureListener {
+                    user.value = User(email = email, displayName = displayName)
+                }
+        }
     }
 
     fun updateProfile(name: String, bio: String, photoUri: Uri? = null) {
