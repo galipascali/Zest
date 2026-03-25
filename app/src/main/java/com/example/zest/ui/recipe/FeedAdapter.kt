@@ -12,43 +12,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.zest.model.Recipe
 import com.example.zest.R
 import com.example.zest.utils.loadImage
-import com.example.zest.utils.loadImageWithCallback
 import com.google.android.material.imageview.ShapeableImageView
 
 class FeedAdapter(
-    private val onItemClick: (Recipe) -> Unit,
-    private val onImagesLoaded: (() -> Unit)? = null
+    private val onItemClick: (Recipe) -> Unit
 ) : ListAdapter<Recipe, FeedAdapter.RecipeViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Recipe>() {
             override fun areItemsTheSame(oldItem: Recipe, newItem: Recipe) = oldItem.id == newItem.id
             override fun areContentsTheSame(oldItem: Recipe, newItem: Recipe) = oldItem == newItem
-        }
-    }
-
-    private var expectedImages = 0
-    private var loadedImages = 0
-    private var callbackFired = false
-
-    override fun submitList(list: List<Recipe>?) {
-        if (!callbackFired && !list.isNullOrEmpty()) {
-            expectedImages = list.count { it.imageUrl.isNotBlank() }
-            loadedImages = 0
-            if (expectedImages == 0) {
-                callbackFired = true
-                onImagesLoaded?.invoke()
-            }
-        }
-        super.submitList(list)
-    }
-
-    private fun onImageResult() {
-        if (callbackFired) return
-        loadedImages++
-        if (loadedImages >= expectedImages) {
-            callbackFired = true
-            onImagesLoaded?.invoke()
         }
     }
 
@@ -71,12 +44,7 @@ class FeedAdapter(
 
         holder.title.text = recipe.title
         holder.creator.text = recipe.creatorEmail.substringBefore("@")
-
-        if (recipe.imageUrl.isNotBlank()) {
-            holder.image.loadImageWithCallback(recipe.imageUrl, R.drawable.welcome_background) { onImageResult() }
-        } else {
-            holder.image.setImageResource(R.drawable.welcome_background)
-        }
+        holder.image.loadImage(recipe.imageUrl, R.drawable.welcome_background)
         holder.avatar.loadImage(recipe.creatorPhoto)
 
         val apiTagTitle = holder.itemView.context.getString(R.string.api_tag_title)

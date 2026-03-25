@@ -19,7 +19,7 @@ class RecipeRepository(context: Context) {
         try {
             val snapshot = firestore.collection("recipes").get().await()
             val recipes = snapshot.documents.mapNotNull { it.toObject(Recipe::class.java) }
-            recipes.forEach { dao.upsert(it) }
+            dao.upsertAll(recipes)
         } catch (e: Exception) {}
     }
 
@@ -29,7 +29,7 @@ class RecipeRepository(context: Context) {
                 .whereEqualTo("userId", userId)
                 .get().await()
             val recipes = snapshot.documents.mapNotNull { it.toObject(Recipe::class.java) }
-            recipes.forEach { dao.upsert(it) }
+            dao.upsertAll(recipes)
         } catch (e: Exception) {}
     }
 

@@ -43,6 +43,9 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     photoUrl = doc.getString("photoUrl") ?: ""
                 )
             }
+            .addOnFailureListener {
+                user.value = User(email = email, displayName = displayName)
+            }
     }
 
     fun updateProfile(name: String, bio: String, photoUri: Uri? = null) {
