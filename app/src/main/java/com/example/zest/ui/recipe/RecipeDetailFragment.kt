@@ -37,6 +37,8 @@ class RecipeDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        showLoading(true)
+
         binding.ingredientsRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.stepsRecycler.layoutManager = LinearLayoutManager(requireContext())
 
@@ -58,7 +60,7 @@ class RecipeDetailFragment : Fragment() {
             binding.detailTitle.text = recipe.title
             binding.detailCreator.text = "@${recipe.creatorEmail.substringBefore("@")}"
             binding.detailsTime.text = "${recipe.time} min"
-            binding.detailsDifficulty.text = recipe.difficulty
+            binding.detailsDifficulty.text = recipe.difficulty ?: "Unknown"
             binding.detailsServings.text = "${recipe.servings} ppl"
 
             binding.detailImage.loadImageWithCallback(recipe.imageUrl, R.drawable.welcome_background) {
