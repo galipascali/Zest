@@ -18,9 +18,10 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         viewModelScope.launch { repository.syncFromFirestore() }
+        viewModelScope.launch { repository.syncFromSpoonacular() }
 
         repository.getAllRecipes().observeForever { recipes ->
-            allRecipes.value = recipes
+            allRecipes.value = recipes.shuffled()
             applyFilters()
         }
         filter.observeForever { applyFilters() }
