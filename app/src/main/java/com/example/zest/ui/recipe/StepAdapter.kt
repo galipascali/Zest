@@ -47,7 +47,7 @@ class StepAdapter(
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(text: Editable?) {
                 val pos = holder.adapterPosition
-                if (pos != RecyclerView.NO_POSITION) steps[pos].text = text.toString()
+                if (pos != RecyclerView.NO_POSITION) { steps[pos].text = text.toString(); onListChanged() }
             }
         }
         b.etInstruction.addTextChangedListener(holder.instructionWatcher)
