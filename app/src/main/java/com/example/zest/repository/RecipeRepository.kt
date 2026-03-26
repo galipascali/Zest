@@ -67,6 +67,16 @@ class RecipeRepository(context: Context) {
         tags = dishTypes ?: emptyList()
     )
 
+    suspend fun updateRecipe(recipe: Recipe): Boolean {
+        return try {
+            firestore.collection("recipes").document(recipe.id).set(recipe).await()
+            dao.upsert(recipe)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     suspend fun addRecipe(recipe: Recipe): Boolean {
         return try {
             val userDoc = firestore.collection("users").document(recipe.userId).get().await()

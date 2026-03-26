@@ -68,10 +68,14 @@ class ProfileFragment : Fragment() {
 
         showLoading(true)
 
-        val adapter = ProfileRecipeAdapter { recipe ->
-            val action = ProfileFragmentDirections.actionProfileToRecipeDetail(recipe.id)
-            findNavController().navigate(action)
-        }
+        val adapter = ProfileRecipeAdapter(
+            onItemClick = { recipe ->
+                findNavController().navigate(ProfileFragmentDirections.actionProfileToRecipeDetail(recipe.id))
+            },
+            onEditClick = { recipe ->
+                findNavController().navigate(ProfileFragmentDirections.actionProfileToEditRecipe(recipe.id))
+            }
+        )
         binding.recipes.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.recipes.adapter = adapter
 

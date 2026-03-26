@@ -35,6 +35,7 @@
             tools:targetApi="28" />
 
         <TextView
+            android:id="@+id/recipeFormTitle"
             android:text="@string/create_recipe_title"
             android:textSize="24sp"
             android:textStyle="bold"

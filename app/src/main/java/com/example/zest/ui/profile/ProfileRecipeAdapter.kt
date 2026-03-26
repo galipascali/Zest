@@ -11,7 +11,8 @@ import com.example.zest.model.Recipe
 import com.example.zest.utils.loadImage
 
 class ProfileRecipeAdapter(
-    private val onItemClick: (Recipe) -> Unit
+    private val onItemClick: (Recipe) -> Unit,
+    private val onEditClick: (Recipe) -> Unit
 ) : ListAdapter<Recipe, ProfileRecipeAdapter.ViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -33,5 +34,6 @@ class ProfileRecipeAdapter(
         holder.binding.recipeTitle.text = item.title
         holder.binding.imgRecipe.loadImage(item.imageUrl, R.drawable.welcome_background)
         holder.itemView.setOnClickListener { onItemClick(item) }
+        holder.binding.editButton.setOnClickListener { onEditClick(item) }
     }
 }

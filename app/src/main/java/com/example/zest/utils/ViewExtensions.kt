@@ -1,6 +1,11 @@
 package com.example.zest.utils
 
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.ColorFilter
+import android.graphics.PixelFormat
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.InsetDrawable
 import android.net.Uri
 import android.text.Editable
 import android.text.TextWatcher
@@ -8,11 +13,13 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.activity.result.ActivityResultLauncher
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.example.zest.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.tasks.await
@@ -89,4 +96,29 @@ fun TextInputEditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
             afterTextChanged.invoke(editable.toString())
         }
     })
+}
+
+fun TextInputLayout.setSmallIcon(drawableRes: Int, sizeDp: Int = 30) {
+    val original = ContextCompat.getDrawable(context, drawableRes)?.mutate() ?: return
+    val sizePx = (sizeDp * context.resources.displayMetrics.density).toInt()
+    startIconDrawable = object : Drawable() {
+        override fun draw(canvas: Canvas) = original.draw(canvas)
+        override fun setBounds(left: Int, top: Int, right: Int, bottom: Int) {
+            super.setBounds(left, top, right, bottom)
+            original.setBounds(left, top, right, bottom)
+        }
+
+        override fun getIntrinsicWidth() = sizePx
+        override fun getIntrinsicHeight() = sizePx + 20
+        override fun setAlpha(alpha: Int) {
+            original.alpha = alpha
+        }
+
+        override fun setColorFilter(colorFilter: ColorFilter?) {
+            original.colorFilter = colorFilter
+        }
+
+        @Suppress("OVERRIDE_DEPRECATION")
+        override fun getOpacity() = PixelFormat.TRANSLUCENT
+    }
 }
