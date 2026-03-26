@@ -77,6 +77,16 @@ class RecipeRepository(context: Context) {
         }
     }
 
+    suspend fun deleteRecipe(recipe: Recipe): Boolean {
+        return try {
+            firestore.collection("recipes").document(recipe.id).delete().await()
+            dao.delete(recipe)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     suspend fun addRecipe(recipe: Recipe): Boolean {
         return try {
             val userDoc = firestore.collection("users").document(recipe.userId).get().await()

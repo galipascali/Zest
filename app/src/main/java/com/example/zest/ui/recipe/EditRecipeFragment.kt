@@ -9,6 +9,7 @@ import androidx.navigation.fragment.navArgs
 import com.example.zest.utils.loadImage
 import com.example.zest.utils.uploadImageToStorage
 import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
@@ -25,6 +26,28 @@ class EditRecipeFragment : RecipeFormFragment() {
     private var initialized = false
 
     override fun onFormReady(predefinedTags: List<String>) {
+        binding.deleteButton.visibility = View.VISIBLE
+        binding.deleteButton.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setMessage("Are you sure you want to delete this recipe? This cannot be undone.")
+                .setPositiveButton("Delete") { _, _ ->
+                    val recipe = viewModel.recipe.value ?: return@setPositiveButton
+                    showFormLoading(true)
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        val success = viewModel.deleteRecipe(recipe)
+                        showFormLoading(false)
+                        if (success) {
+                            findNavController().popBackStack()
+                        } else {
+                            Snackbar.make(requireView(), "Failed to delete recipe", Snackbar.LENGTH_SHORT)
+                                .setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show()
+                        }
+                    }
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+
         viewModel.recipe.observe(viewLifecycleOwner) { recipe ->
             if (initialized || recipe == null) return@observe
             initialized = true

@@ -13,6 +13,7 @@ class EditRecipeViewModel(application: Application, recipeId: String) : AndroidV
     val recipe: LiveData<Recipe?> = repository.getRecipeById(recipeId)
 
     suspend fun updateRecipe(recipe: Recipe): Boolean = repository.updateRecipe(recipe)
+    suspend fun deleteRecipe(recipe: Recipe): Boolean = repository.deleteRecipe(recipe)
 
     class Factory(
         private val application: Application,
