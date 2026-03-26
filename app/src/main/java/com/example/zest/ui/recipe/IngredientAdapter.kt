@@ -39,7 +39,7 @@ class IngredientAdapter(
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(text: Editable?) {
                 val pos = holder.adapterPosition
-                if (pos != RecyclerView.NO_POSITION) ingredients[pos].quantity = text.toString()
+                if (pos != RecyclerView.NO_POSITION) { ingredients[pos].quantity = text.toString(); onListChanged() }
             }
         }
 
@@ -48,7 +48,7 @@ class IngredientAdapter(
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(text: Editable?) {
                 val pos = holder.adapterPosition
-                if (pos != RecyclerView.NO_POSITION) ingredients[pos].name = text.toString()
+                if (pos != RecyclerView.NO_POSITION) { ingredients[pos].name = text.toString(); onListChanged() }
             }
         }
 
