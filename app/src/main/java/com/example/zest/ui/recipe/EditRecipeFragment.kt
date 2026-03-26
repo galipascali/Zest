@@ -2,6 +2,7 @@ package com.example.zest.ui.recipe
 
 import android.graphics.Color
 import android.view.View
+import com.example.zest.R
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -40,7 +41,7 @@ class EditRecipeFragment : RecipeFormFragment() {
                             findNavController().popBackStack()
                         } else {
                             Snackbar.make(requireView(), "Failed to delete recipe", Snackbar.LENGTH_SHORT)
-                                .setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show()
+                                .setBackgroundTint(requireContext().getColor(R.color.error)).setTextColor(Color.WHITE).show()
                         }
                     }
                 }
@@ -105,10 +106,12 @@ class EditRecipeFragment : RecipeFormFragment() {
             val success = viewModel.updateRecipe(updated)
             showFormLoading(false)
             if (success) {
+                Snackbar.make(view, "Changes saved", Snackbar.LENGTH_SHORT)
+                    .setBackgroundTint(requireContext().getColor(R.color.success)).setTextColor(Color.WHITE).show()
                 findNavController().popBackStack()
             } else {
                 Snackbar.make(view, "Failed to save changes", Snackbar.LENGTH_SHORT)
-                    .setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show()
+                    .setBackgroundTint(requireContext().getColor(R.color.error)).setTextColor(Color.WHITE).show()
             }
         }
     }

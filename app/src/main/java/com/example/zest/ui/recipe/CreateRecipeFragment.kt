@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.zest.R
 import com.example.zest.model.Recipe
 import com.example.zest.repository.RecipeRepository
 import com.example.zest.utils.uploadImageToStorage
@@ -50,11 +51,11 @@ class CreateRecipeFragment : RecipeFormFragment() {
 
             if (success) {
                 Snackbar.make(view, "Recipe published!", Snackbar.LENGTH_SHORT)
-                    .setBackgroundTint(Color.parseColor("#4CAF50")).setTextColor(Color.WHITE).show()
+                .setBackgroundTint(requireContext().getColor(R.color.success)).setTextColor(Color.WHITE).show()
                 findNavController().popBackStack()
             } else {
                 Snackbar.make(view, "Failed to publish recipe", Snackbar.LENGTH_SHORT)
-                    .setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show()
+                    .setBackgroundTint(requireContext().getColor(R.color.error)).setTextColor(Color.WHITE).show()
             }
         }
     }

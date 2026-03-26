@@ -13,4 +13,6 @@
     <color name="dark_grey">#374151</color>
     <color name="app_green">#2F5D3B</color>
     <color name="app_background">#FAFAF9</color>
+    <color name="error">#CC0000</color>
+    <color name="success">#4caf50</color>
 </resources>

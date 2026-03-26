@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.zest.R
@@ -15,6 +16,7 @@ import com.example.zest.utils.afterTextChanged
 import com.example.zest.utils.showLoading
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 
 class LoginFragment : Fragment() {
 
@@ -54,11 +56,16 @@ class LoginFragment : Fragment() {
                 showLoading(false)
                 if (task.isSuccessful) {
                     Snackbar.make(view, "Login Success", Snackbar.LENGTH_SHORT)
-                        .setBackgroundTint(Color.GREEN).setTextColor(Color.WHITE).show()
+                        .setBackgroundTint(requireContext().getColor(R.color.success))
+                        .setTextColor(Color.WHITE).show()
                     findNavController().navigate(R.id.action_login_to_feed)
                 } else {
-                    Snackbar.make(view, "Login Failed", Snackbar.LENGTH_SHORT)
-                        .setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show()
+                    val message = when ((task.exception as? FirebaseAuthException)?.errorCode) {
+                        "ERROR_NETWORK_REQUEST_FAILED" -> "Network error, check your connection"
+                        else -> "Login failed"
+                    }
+
+                    Snackbar.make(view, message, Snackbar.LENGTH_SHORT).setBackgroundTint(R.color.error).setTextColor(Color.WHITE).show()
                 }
             }
         }

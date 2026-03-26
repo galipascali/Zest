@@ -17,7 +17,9 @@ import com.example.zest.model.User
 import com.example.zest.utils.loadImage
 import com.example.zest.utils.showImagePickerDialog
 import com.example.zest.utils.showLoading
+import android.graphics.Color
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 
 class ProfileFragment : Fragment() {
@@ -80,6 +82,16 @@ class ProfileFragment : Fragment() {
         binding.recipes.adapter = adapter
 
         viewModel.recipes.observe(viewLifecycleOwner) { adapter.submitList(it) }
+
+        viewModel.updateProfileResult.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                Snackbar.make(requireView(), "Profile updated", Snackbar.LENGTH_SHORT)
+                    .setBackgroundTint(requireContext().getColor(R.color.success)).setTextColor(Color.WHITE).show()
+            } else {
+                Snackbar.make(requireView(), "Failed to update profile", Snackbar.LENGTH_SHORT)
+                    .setBackgroundTint(requireContext().getColor(R.color.error)).setTextColor(Color.WHITE).show()
+            }
+        }
 
         viewModel.user.observe(viewLifecycleOwner) { profile ->
             currentUser = profile

@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import android.widget.Toast
 import com.example.zest.R
 import com.example.zest.databinding.FragmentRecipeDetailBinding
 import com.example.zest.utils.loadImageWithCallback
@@ -55,7 +56,12 @@ class RecipeDetailFragment : Fragment() {
         binding.tabInstructions.setOnClickListener { selectTab(false) }
 
         viewModel.recipe.observe(viewLifecycleOwner) { recipe ->
-            recipe ?: return@observe
+            if (recipe == null) {
+                showLoading(false)
+                Toast.makeText(requireContext(), "Recipe not found", Toast.LENGTH_SHORT).show()
+                findNavController().popBackStack()
+                return@observe
+            }
 
             binding.detailTitle.text = recipe.title
             binding.detailCreator.text = "@${recipe.creatorEmail.substringBefore("@")}"
