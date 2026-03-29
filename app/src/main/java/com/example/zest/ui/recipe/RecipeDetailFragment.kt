@@ -9,11 +9,11 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import android.widget.Toast
 import com.example.zest.R
 import com.example.zest.databinding.FragmentRecipeDetailBinding
 import com.example.zest.utils.loadImageWithCallback
 import com.example.zest.utils.showLoading
+import com.google.android.material.snackbar.Snackbar
 
 class RecipeDetailFragment : Fragment() {
 
@@ -58,7 +58,8 @@ class RecipeDetailFragment : Fragment() {
         viewModel.recipe.observe(viewLifecycleOwner) { recipe ->
             if (recipe == null) {
                 showLoading(false)
-                Toast.makeText(requireContext(), "Recipe not found", Toast.LENGTH_SHORT).show()
+                Snackbar.make(requireView(), "Recipe not found", Snackbar.LENGTH_SHORT)
+                    .setBackgroundTint(requireContext().getColor(R.color.error)).setTextColor(requireContext().getColor(R.color.white)).show()
                 findNavController().popBackStack()
                 return@observe
             }
