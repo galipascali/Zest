@@ -13,6 +13,7 @@ import com.example.zest.R
 import com.example.zest.databinding.FragmentRecipeDetailBinding
 import com.example.zest.utils.loadImageWithCallback
 import com.example.zest.utils.showLoading
+import com.google.android.material.snackbar.Snackbar
 
 class RecipeDetailFragment : Fragment() {
 
@@ -55,7 +56,13 @@ class RecipeDetailFragment : Fragment() {
         binding.tabInstructions.setOnClickListener { selectTab(false) }
 
         viewModel.recipe.observe(viewLifecycleOwner) { recipe ->
-            recipe ?: return@observe
+            if (recipe == null) {
+                showLoading(false)
+                Snackbar.make(requireView(), "Recipe not found", Snackbar.LENGTH_SHORT)
+                    .setBackgroundTint(requireContext().getColor(R.color.error)).setTextColor(requireContext().getColor(R.color.white)).show()
+                findNavController().popBackStack()
+                return@observe
+            }
 
             binding.detailTitle.text = recipe.title
             binding.detailCreator.text = "@${recipe.creatorEmail.substringBefore("@")}"

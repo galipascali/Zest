@@ -143,7 +143,11 @@ abstract class RecipeFormFragment : Fragment() {
         binding.etDifficulty.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, difficultyItems))
         binding.etDifficulty.setOnItemClickListener { _, _, _, _ ->
             difficultyValidated = true
+            binding.difficultyDropdown.error = null
             updateButtonState()
+        }
+        binding.etDifficulty.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus && !difficultyValidated) binding.difficultyDropdown.error = "Select a difficulty"
         }
 
         binding.etTitle.addTextChangedListener(object : TextWatcher {
@@ -183,6 +187,8 @@ abstract class RecipeFormFragment : Fragment() {
             binding.emptyIngredient.visibility = if (count > 0) View.GONE else View.VISIBLE
             binding.ingredientsRecyclerView.visibility = if (count > 0) View.VISIBLE else View.GONE
             binding.ingredientsCount.text = "$count items"
+            val hasFullIngredient = ingredients.any { it.quantity.isNotBlank() && it.name.isNotBlank() }
+            binding.ingredientsError.visibility = if (count > 0 && !hasFullIngredient) View.VISIBLE else View.GONE
             updateButtonState()
         }
 
@@ -206,6 +212,8 @@ abstract class RecipeFormFragment : Fragment() {
         fun updateStepsCount() {
             binding.emptyStep.visibility = if (steps.size > 0) View.GONE else View.VISIBLE
             binding.stepsRecyclerView.visibility = if (steps.size > 0) View.VISIBLE else View.GONE
+            val hasFullStep = steps.any { it.text.isNotBlank() }
+            binding.stepsError.visibility = if (steps.size > 0 && !hasFullStep) View.VISIBLE else View.GONE
             updateButtonState()
         }
 

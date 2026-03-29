@@ -297,6 +297,17 @@
                         android:textSize="14sp" />
                 </LinearLayout>
 
+                <TextView
+                    android:id="@+id/ingredientsError"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:textSize="12sp"
+                    android:textColor="#B00020"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="Fill in at least one complete ingredient" />
+
                 <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/ingredientsRecyclerView"
                 android:nestedScrollingEnabled="false"
@@ -418,6 +429,17 @@
                         android:textColor="@color/dark_grey"
                         android:textSize="16sp"
                         android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/stepsError"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:textSize="12sp"
+                    android:textColor="#B00020"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="Fill in at least one complete step" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/stepsRecyclerView"

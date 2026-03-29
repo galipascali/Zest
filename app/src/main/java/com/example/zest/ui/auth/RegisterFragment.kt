@@ -16,6 +16,7 @@ import com.example.zest.utils.afterTextChanged
 import com.example.zest.utils.showLoading
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -57,12 +58,13 @@ class RegisterFragment : Fragment() {
             } catch (e: Exception) { false }
         }
 
-        suspend fun registerUser(): String? {
+        suspend fun registerUser(): Pair<String?, Exception?> {
             return try {
-                FirebaseAuth.getInstance()
+                val uid = FirebaseAuth.getInstance()
                     .createUserWithEmailAndPassword(binding.etEmail.text.toString(), binding.etPassword.text.toString())
                     .await().user?.uid
-            } catch (e: Exception) { null }
+                Pair(uid, null)
+            } catch (e: Exception) { Pair(null, e) }
         }
 
         fun confirmPasswordValidate() {
@@ -79,24 +81,31 @@ class RegisterFragment : Fragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 showLoading(true)
                 binding.btnSignup.isEnabled = false
-                val uid = registerUser()
+                val (uid, error) = registerUser()
                 if (uid != null) {
                     val saved = saveUserToFirestore(uid, binding.etEmail.text.toString())
                     showLoading(false)
                     binding.btnSignup.isEnabled = true
                     if (saved) {
-                        Snackbar.make(view, "Registration Success", Snackbar.LENGTH_SHORT)
-                            .setBackgroundTint(Color.GREEN).setTextColor(Color.WHITE).show()
+                        Snackbar.make(view, "Registration Success", Snackbar.LENGTH_SHORT).setBackgroundTint(requireContext().getColor(R.color.success)).setTextColor(Color.WHITE).show()
                         findNavController().navigate(R.id.action_register_to_feed)
                     } else {
-                        Snackbar.make(view, "Registration failed", Snackbar.LENGTH_SHORT)
-                            .setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show()
+                        Snackbar.make(view, "Account created but failed to save profile", Snackbar.LENGTH_LONG)
+                            .setBackgroundTint(requireContext().getColor(R.color.error)).setTextColor(Color.WHITE).show()
                     }
                 } else {
                     showLoading(false)
                     binding.btnSignup.isEnabled = true
-                    Snackbar.make(view, "Registration failed", Snackbar.LENGTH_SHORT)
-                        .setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show()
+                    val message = when ((error as? FirebaseAuthException)?.errorCode) {
+                        "ERROR_EMAIL_ALREADY_IN_USE" -> "An account with this email already exists"
+                        "ERROR_WEAK_PASSWORD" -> "Password is too weak"
+                        "ERROR_INVALID_EMAIL" -> "Invalid email address"
+                        "ERROR_NETWORK_REQUEST_FAILED" -> "Network error, check your connection"
+                        else -> "Registration failed"
+                    }
+                    Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
+                        .setBackgroundTint(requireContext().getColor(R.color.error))
+                        .setTextColor(Color.WHITE).show()
                 }
             }
         }
