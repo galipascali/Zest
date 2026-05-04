@@ -67,7 +67,7 @@ class RecipeDetailFragment : Fragment() {
             binding.detailTitle.text = recipe.title
             binding.detailCreator.text = "@${recipe.creatorEmail.substringBefore("@")}"
             binding.detailsTime.text = "${recipe.time} min"
-            binding.detailsDifficulty.text = recipe.difficulty ?: "Unknown"
+            binding.detailsDifficulty.text = recipe.difficulty.takeIf { it.isNotBlank() } ?: "Unknown"
             binding.detailsServings.text = "${recipe.servings} ppl"
 
             binding.detailImage.loadImageWithCallback(recipe.imageUrl, R.drawable.welcome_background) {

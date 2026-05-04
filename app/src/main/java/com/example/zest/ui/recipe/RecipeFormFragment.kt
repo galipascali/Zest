@@ -40,7 +40,7 @@ abstract class RecipeFormFragment : Fragment() {
     private var titleValidated = false
     private var timeValidated = false
     private var servingsValidated = false
-    private var difficultyValidated = false
+    protected var difficultyValidated = false
 
     protected abstract val formTitle: String
     protected abstract val saveButtonText: String
@@ -85,6 +85,24 @@ abstract class RecipeFormFragment : Fragment() {
 
     protected fun updateButtonState() {
         _binding?.btnLogin?.isEnabled = isFormValid()
+    }
+
+    protected fun updateIngredientsCount() {
+        val count = ingredients.size
+        _binding?.emptyIngredient?.visibility = if (count > 0) View.GONE else View.VISIBLE
+        _binding?.ingredientsRecyclerView?.visibility = if (count > 0) View.VISIBLE else View.GONE
+        _binding?.ingredientsCount?.text = "$count items"
+        val hasFullIngredient = ingredients.any { it.quantity.isNotBlank() && it.name.isNotBlank() }
+        _binding?.ingredientsError?.visibility = if (count > 0 && !hasFullIngredient) View.VISIBLE else View.GONE
+        updateButtonState()
+    }
+
+    protected fun updateStepsCount() {
+        _binding?.emptyStep?.visibility = if (steps.size > 0) View.GONE else View.VISIBLE
+        _binding?.stepsRecyclerView?.visibility = if (steps.size > 0) View.VISIBLE else View.GONE
+        val hasFullStep = steps.any { it.text.isNotBlank() }
+        _binding?.stepsError?.visibility = if (steps.size > 0 && !hasFullStep) View.VISIBLE else View.GONE
+        updateButtonState()
     }
 
     protected fun createTag(text: String, isChecked: Boolean = false): Chip {
@@ -182,16 +200,6 @@ abstract class RecipeFormFragment : Fragment() {
             }
         })
 
-        fun updateIngredientsCount() {
-            val count = ingredients.size
-            binding.emptyIngredient.visibility = if (count > 0) View.GONE else View.VISIBLE
-            binding.ingredientsRecyclerView.visibility = if (count > 0) View.VISIBLE else View.GONE
-            binding.ingredientsCount.text = "$count items"
-            val hasFullIngredient = ingredients.any { it.quantity.isNotBlank() && it.name.isNotBlank() }
-            binding.ingredientsError.visibility = if (count > 0 && !hasFullIngredient) View.VISIBLE else View.GONE
-            updateButtonState()
-        }
-
         ingredientAdapter = IngredientAdapter(ingredients) { updateIngredientsCount() }
         binding.ingredientsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.ingredientsRecyclerView.adapter = ingredientAdapter
@@ -208,14 +216,6 @@ abstract class RecipeFormFragment : Fragment() {
             }
             override fun onSwiped(vh: RecyclerView.ViewHolder, direction: Int) {}
         }).attachToRecyclerView(binding.ingredientsRecyclerView)
-
-        fun updateStepsCount() {
-            binding.emptyStep.visibility = if (steps.size > 0) View.GONE else View.VISIBLE
-            binding.stepsRecyclerView.visibility = if (steps.size > 0) View.VISIBLE else View.GONE
-            val hasFullStep = steps.any { it.text.isNotBlank() }
-            binding.stepsError.visibility = if (steps.size > 0 && !hasFullStep) View.VISIBLE else View.GONE
-            updateButtonState()
-        }
 
         stepsAdapter = StepAdapter(steps) { updateStepsCount() }
         binding.stepsRecyclerView.layoutManager = LinearLayoutManager(requireContext())

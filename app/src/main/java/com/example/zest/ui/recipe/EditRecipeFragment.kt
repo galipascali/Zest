@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.zest.utils.loadImage
 import com.example.zest.utils.uploadImageToStorage
+import com.google.firebase.auth.FirebaseAuth
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -58,6 +59,7 @@ class EditRecipeFragment : RecipeFormFragment() {
             binding.etTime.setText(recipe.time.toString())
             binding.etServings.setText(recipe.servings.toString())
             binding.etDifficulty.setText(recipe.difficulty, false)
+            if (recipe.difficulty.isNotBlank()) difficultyValidated = true
 
             if (recipe.imageUrl.isNotBlank()) {
                 binding.recipePhoto.loadImage(recipe.imageUrl)
@@ -67,9 +69,11 @@ class EditRecipeFragment : RecipeFormFragment() {
 
             ingredients.addAll(recipe.ingredients)
             ingredientAdapter.notifyDataSetChanged()
+            updateIngredientsCount()
 
             steps.addAll(recipe.steps)
             stepsAdapter.notifyDataSetChanged()
+            updateStepsCount()
 
             for (i in 0 until binding.tagsGroup.childCount) {
                 val chip = binding.tagsGroup.getChildAt(i) as? Chip ?: continue
@@ -87,9 +91,17 @@ class EditRecipeFragment : RecipeFormFragment() {
         prepareForSave()
         showFormLoading(true)
         viewLifecycleOwner.lifecycleScope.launch {
-            val imageUrl = selectedImageUri?.let {
-                uploadImageToStorage(requireContext(), it, "recipe_images/${System.currentTimeMillis()}.jpg")
-            } ?: existingImageUrl
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+            val uploadedUrl = selectedImageUri?.let {
+                uploadImageToStorage(requireContext(), it, "recipe_images/${userId}_${System.currentTimeMillis()}.jpg")
+            }
+            if (uploadedUrl != null && uploadedUrl.isBlank()) {
+                showFormLoading(false)
+                Snackbar.make(view, "Failed to upload image", Snackbar.LENGTH_SHORT)
+                    .setBackgroundTint(requireContext().getColor(R.color.error)).setTextColor(Color.WHITE).show()
+                return@launch
+            }
+            val imageUrl = uploadedUrl ?: existingImageUrl
 
             val current = viewModel.recipe.value ?: return@launch
             val updated = current.copy(
